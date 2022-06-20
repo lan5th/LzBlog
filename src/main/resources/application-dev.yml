@@ -1,0 +1,21 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/lz_blog?useUnicode=true&characterEncoding=utf8&useSSL=false
+    username: root
+    password: Zyh20010605
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
+  redis:
+    host: 127.0.0.1
+    password: 123456
+    port: 6379
+
+mybatis:
+  type-aliases-package: com.lan5th.blog.pojo
+  mapper-locations: classpath:dao/*.xml
+  configuration: #代替配置文件的功能
+    map-underscore-to-camel-case: true
+
