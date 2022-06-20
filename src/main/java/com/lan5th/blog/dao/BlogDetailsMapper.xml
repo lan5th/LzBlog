@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lan5th.blog.dao.BlogDetailsMapper">
+    <select id="getById" parameterType="long" resultType="com.lan5th.blog.pojo.BlogDetail">
+        select * from lz_blog.blog_details where blog_id = #{id};
+    </select>
+
+    <update id="update" parameterType="com.lan5th.blog.pojo.BlogDetail">
+        update lz_blog.blog_details set blog_id = #{blogId}, blog_name = #{blogName}, location = #{location} where blog_id = #{blogId};
+    </update>
+
+    <insert id="insert" parameterType="com.lan5th.blog.pojo.BlogDetail">
+        insert into lz_blog.blog_details(blog_id, blog_name, location) VALUES (#{blogId}, #{blogName}, #{location});
+    </insert>
+
+    <update id="deleteById" parameterType="long">
+        update lz_blog.blog_details set deleted = 1 where blog_Id = #{id};
+    </update>
+
+    <delete id="remove" parameterType="long">
+        delete from lz_blog.blog_details where blog_id = #{id} and deleted = 1;
+    </delete>
+</mapper>
