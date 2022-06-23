@@ -5,7 +5,7 @@ import java.util.Date;
 
 /**
  * @author lan5th
- * 2022.2.10
+ * @date 2022/6/23 21:40
  * 生成long型UID
  */
 public class UIDUtil {

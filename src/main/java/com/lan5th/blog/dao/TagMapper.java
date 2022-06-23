@@ -6,6 +6,10 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * @author lan5th
+ * @date 2022/6/23 21:40
+ */
 @Mapper
 @Component
 public interface TagMapper {

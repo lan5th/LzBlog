@@ -5,6 +5,10 @@ import com.lan5th.blog.pojo.BlogDetail;
 
 import java.util.List;
 
+/**
+ * @author lan5th
+ * @date 2022/6/23 21:40
+ */
 public interface BlogsService {
     /**
      * 按时间分页查询

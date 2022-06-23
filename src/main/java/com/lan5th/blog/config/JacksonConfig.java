@@ -6,6 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
+/**
+ * @author lan5th
+ * @date 2022/6/23 21:40
+ */
 @Configuration
 public class JacksonConfig {
     

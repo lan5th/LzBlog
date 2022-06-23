@@ -17,6 +17,10 @@ import org.springframework.web.servlet.ModelAndView;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * @author lan5th
+ * @date 2022/6/23 21:40
+ */
 @Controller
 @RequestMapping("/index")
 public class IndexController {

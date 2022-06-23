@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+/**
+ * @author lan5th
+ * @date 2022/6/23 21:40
+ */
 @Controller
 @RequestMapping("/details")
 public class BlogDetailsController {

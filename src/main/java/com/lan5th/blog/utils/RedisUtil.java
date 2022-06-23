@@ -8,6 +8,10 @@ import org.springframework.util.CollectionUtils;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author lan5th
+ * @date 2022/6/23 21:40
+ */
 @Component
 public class RedisUtil {
     @Autowired

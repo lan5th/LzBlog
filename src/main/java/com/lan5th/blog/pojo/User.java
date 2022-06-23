@@ -5,6 +5,10 @@ import lombok.Data;
 
 import java.sql.Date;
 
+/**
+ * @author lan5th
+ * @date 2022/6/23 21:40
+ */
 @Data
 public class User {
     private Long id;

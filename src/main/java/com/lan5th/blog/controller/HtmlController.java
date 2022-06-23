@@ -3,6 +3,10 @@ package com.lan5th.blog.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+/**
+ * @author lan5th
+ * @date 2022/6/23 21:40
+ */
 @Controller
 @RequestMapping("/html")
 public class HtmlController {

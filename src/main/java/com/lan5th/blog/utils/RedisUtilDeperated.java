@@ -11,6 +11,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * @author lan5th
+ * @date 2022/6/23 21:40
+ */
 @Component
 public final class RedisUtilDeperated {
 

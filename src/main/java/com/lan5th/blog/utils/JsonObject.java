@@ -4,6 +4,10 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author lan5th
+ * @date 2022/6/23 21:40
+ */
 public class JsonObject implements Serializable {
     private static final Long serialVersionUID = 7574078101944305355L;
     private Boolean status;

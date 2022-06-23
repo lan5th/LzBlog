@@ -6,7 +6,11 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-//其实只需要一个@Mapper就足够了，添加@Component是解决idea报错
+/**
+ * @author lan5th
+ * @date 2022/6/23 21:40
+ * 其实只需要一个@Mapper就足够了，添加@Component是解决idea报错
+ */
 @Mapper
 @Component
 public interface BlogMapper {

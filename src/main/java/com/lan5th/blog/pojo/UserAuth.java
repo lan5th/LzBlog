@@ -3,6 +3,10 @@ package com.lan5th.blog.pojo;
 import com.lan5th.blog.utils.UIDUtil;
 import lombok.Data;
 
+/**
+ * @author lan5th
+ * @date 2022/6/23 21:40
+ */
 @Data
 public class UserAuth {
     private Long id;

@@ -2,6 +2,10 @@ package com.lan5th.blog.service;
 
 import com.lan5th.blog.pojo.BlogDetail;
 
+/**
+ * @author lan5th
+ * @date 2022/6/23 21:40
+ */
 public interface BlogDetailsService {
     /**
      * 获取单个博客详情

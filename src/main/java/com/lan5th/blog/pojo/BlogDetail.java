@@ -1,12 +1,14 @@
 package com.lan5th.blog.pojo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.lan5th.blog.utils.UIDUtil;
-import com.sun.xml.internal.ws.developer.Serialization;
 import lombok.Data;
 
 import java.sql.Date;
 
+/**
+ * @author lan5th
+ * @date 2022/6/23 21:40
+ */
 @Data
 public class BlogDetail {
     private Long id;

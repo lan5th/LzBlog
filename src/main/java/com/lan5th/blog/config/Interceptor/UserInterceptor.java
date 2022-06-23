@@ -1,16 +1,15 @@
 package com.lan5th.blog.config.Interceptor;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.lang.reflect.Method;
 
+/**
+ * @author lan5th
+ * @date 2022/6/23 21:40
+ */
 @Component
 public class UserInterceptor implements HandlerInterceptor {
     @Override
