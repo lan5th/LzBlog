@@ -58,7 +58,7 @@ public class RedisUtil {
      * @return true成功 false失败
      */
 
-    public boolean set(String key, Object value) {
+    private boolean set(String key, Object value) {
         try {
             redisTemplate.opsForValue().set(key, value);
             return true;

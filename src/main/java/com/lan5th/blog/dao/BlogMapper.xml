@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lan5th.blog.dao.BlogMapper">
+    <select id="getById" parameterType="long" resultType="com.lan5th.blog.pojo.BlogDetail">
+        select * from lz_blog.blogs b, lz_blog.tags t where b.id = #{id} and b.tag_id = t.id and b.deleted = 0;
+    </select>
+
+    <update id="update" parameterType="com.lan5th.blog.pojo.BlogDetail">
+        update lz_blog.blogs b, lz_blog.tags t set blog_name = #{blogName}, location = #{location}, tag_id = #{tagId}, short_content = #{shortContent} where b.id = #{id} and b.deleted = 0;
+    </update>
+
+    <insert id="save" parameterType="com.lan5th.blog.pojo.BlogDetail">
+        insert into lz_blog.blogs(id, blog_name, location, tag_id, short_content) VALUES (#{id}, #{blogName}, #{location}, #{tagId}, #{shortContent});
+    </insert>
+
+    <update id="deleteByIds" parameterType="list">
+        update lz_blog.blogs set deleted = 1 where id in
+        <foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>;
+    </update>
+
+    <delete id="physicalRemoveByIds" parameterType="long">
+        delete from lz_blog.blogs where id in
+        <foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>;
+    </delete>
+
+    <!--这里注意resultType是list里面的类型，而不是java.util.list-->
+    <select id="getPagination" resultType="com.lan5th.blog.pojo.BlogDetail">
+        select b1.*, t.tag_name from lz_blog.blogs as b1, lz_blog.tags as t
+        where b1.id in (select b3.id from (select b2.id from lz_blog.blogs as b2
+        <where>
+            <if test="tagId != null">
+                and b2.tag_id = #{tagId}
+            </if>
+             and b2.deleted = 0
+        </where>
+        order by b2.create_time desc limit #{preNum}, #{postNum}) as b3)
+        and b1.tag_id = t.id order by b1.create_time desc;
+    </select>
+
+    <select id="getByIds" parameterType="list" resultType="com.lan5th.blog.pojo.BlogDetail">
+        select * from lz_blog.blogs b, lz_blog.tags t where b.id in
+        <foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+        and b.tag_id = t.id and b.deleted = 0;
+    </select>
+
+    <select id="getTotalCount" resultType="integer">
+        select count(1) from lz_blog.blogs where deleted = 0;
+    </select>
+</mapper>

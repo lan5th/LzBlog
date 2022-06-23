@@ -51,14 +51,14 @@ layui.config({
 
     //鼠标按住轮播手动控制滑动
     //静态页面存在跨域问题，请部署到服务器使用
-    var scripts = [
-        '../res/lib/jquery.event.move.js',
-        '../res/lib/jquery.event.swipe.js'
-    ];
-    $.getScript(scripts[0]);
-    $.getScript(scripts[1], function () {
-        sliderInvoke.initSwipe();
-    });
+    // var scripts = [
+    //     '../res/lib/jquery.event.move.js',
+    //     '../res/lib/jquery.event.swipe.js'
+    // ];
+    // $.getScript(scripts[0]);
+    // $.getScript(scripts[1], function () {
+    //     sliderInvoke.initSwipe();
+    // });
 });
 
 layui.use(['jquery', 'util'], function (carousel) {
@@ -67,7 +67,7 @@ layui.use(['jquery', 'util'], function (carousel) {
         , device = layui.device();
 
     var serverTime = new Date();
-    var startTime = new Date(2018, 2, 3);  //开始时间  js月份从0开始;
+    var startTime = new Date(2022, 5, 20);  //开始时间  js月份从0开始;
 
     $(function () {
         playAnnouncement();

@@ -69,50 +69,21 @@
     <!-- 首页内容 -->
     <div class="layui-container">
         <div class="layui-row layui-col-space15">
-            <!--左边小栏目-->
+            <!--左侧tag栏-->
             <div class="layui-col-md4">
                 <div class="layui-row layui-col-space10">
                     <div class="layui-col-sm12 layui-col-md12">
-                        <div class="blogerinfo shadow">
-                            <!--                            <div class="blogerinfo-figure">-->
-                            <!--                                <img src="/res/images/Leo.jpg" alt="Leo" />-->
-                            <!--                            </div>-->
-                            <div class="blogerinfo-info">
-                                <p class="blogerinfo-nickname">Lan5th</p>
-                                <p class="blogerinfo-introduce">主要在学习Java编程，还有很大进步空间</p>
-                                <!--                                <p class="blogerinfo-location"><i class="fa fa-location-arrow"></i>&nbsp;四川 - 成都</p>-->
+                        <div class="blog-card shadow sr-rightmodule">
+                            <div class="blog-card-title">
+                                <span class="icon"><i class="layui-icon" aria-hidden="true">&#xe6c6;</i></span>
+                                <span class="text">所有分类</span>
                             </div>
-                            <div class="blogerinfo-contact">
-                                <a target="_blank" title="QQ交流"
-                                   href="http://wpa.qq.com/msgrd?v=3&uin=576247105&site=qq&menu=yes"><i
-                                        class="fa fa-qq fa-2x"></i></a>
-                                <a target="_blank" title="给我写信"
-                                   href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=lan5th@foxmail.com"
-                                   style="text-decoration:none;"><i class="fa fa-envelope fa-2x"></i></a>
-                                <a target="_blank" title="bilibili" href="https://space.bilibili.com/22187553"><i
-                                        class="fa fa-star fa-2x"></i></a>
-                                <a target="_blank" title="GitHub" href="https://github.com/lan5th"><i
-                                        class="fa fa-github fa-2x"></i></a>
-                            </div>
-                            <div class="bloginfo-statistics">
-                                <div class="item">
-                                    <span>12</span>
-                                    <p>博文</p>
+                            <div style="margin: 10px">
+                                <div class="layui-btn-container">
+                                    <button type="button" class="layui-btn">按钮一</button>
+                                    <button type="button" class="layui-btn">按钮二</button>
+                                    <button type="button" class="layui-btn">按钮三</button>
                                 </div>
-                                <div class="item">
-                                    <span>12</span>
-                                    <p>分类</p>
-                                </div>
-                                <div class="item">
-                                    <span>12</span>
-                                    <p>评论</p>
-                                </div>
-                                <div class="item">
-                                    <span>12</span>
-                                    <p>留言</p>
-                                </div>
-                            </div>
-                            <div class="bloginfo-runtime">博客已运行<span style="margin-left:4px;">583天14时17分38秒</span>
                             </div>
                         </div>
                     </div>
@@ -163,23 +134,18 @@
                     </div>
                     <!--空白填充块-->
                     <div class="layui-col-sm6 layui-col-md12">
-                        <div style="width:200px; height:200px; opacity: 100%"></div>
+                        <div style="width:200px; height:400px; opacity: 100%"></div>
                     </div>
                 </div>
             </div>
-            <!--右边文章列表-->
+            <!--右侧展示文章列表-->
             <div class="layui-col-md8">
                 <div class="left-box">
-                    <p class="left-box-title shadow"><i class="fa fa-diamond fa-fw" aria-hidden="true"></i>置顶博文</p>
-                    <div id="top-blog-show"></div>
-                </div>
-                <div class="left-box">
-                    <p class="left-box-title shadow sr-listshow"><i class="fa fa-signal fa-fw" aria-hidden="true"></i>最新博文</p>
+                    <p class="left-box-title shadow sr-listshow"><i class="fa fa-signal fa-fw" aria-hidden="true"></i>所有博文</p>
                     <div id="newest-blog-show"></div>
                     <div id="layui-page"></div>
                 </div>
             </div>
-
         </div>
     </div>
 </div>
@@ -190,7 +156,7 @@
 <!-- 侧边导航遮罩 -->
 <div class="blog-mask animated layui-hide"></div>
 <script src="/res/lib/jquery.min.js"></script>
-<script src="/res/js/index.js"></script>
+<script src="/res/js/tags.js"></script>
 <!-- 引用公共资源 -->
 <script type="text/javascript">
     $(document).ready(function() {
@@ -198,7 +164,7 @@
         $("#head").load("/html/head.html");
         $("#layout").load("/html/layout.html");
         $("#side").load("/html/side.html");
-        topBlog();
+        getAllTags();
     });
 </script>
 <script src="https://cdn.bootcss.com/scrollReveal.js/3.3.6/scrollreveal.js"></script>

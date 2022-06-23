@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lan5th.blog.dao.TagMapper">
+    <select id="getById" parameterType="long" resultType="com.lan5th.blog.pojo.Tag">
+        select * from lz_blog.tags where id = #{id} and deleted = 0;
+    </select>
+
+    <update id="update" parameterType="com.lan5th.blog.pojo.Tag">
+        update lz_blog.tags set tag_name = #{tagName}, blogCount = #{blogCount} where id = #{id} and deleted = 0;
+    </update>
+
+    <insert id="save" parameterType="com.lan5th.blog.pojo.Tag">
+        insert into lz_blog.tags(id, tag_name, blogCount) VALUES (#{id}, #{tagName}, #{blogCount});
+    </insert>
+
+    <update id="deleteByIds" parameterType="list">
+        update lz_blog.blogs set deleted = 1 where id in
+        <foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
+            #{id}
+        </foreach>;
+    </update>
+
+    <!--这里注意resultType是list里面的类型，而不是java.util.list-->
+    <select id="getAllTags" resultType="com.lan5th.blog.pojo.Tag">
+        select id, tag_name, create_time, blogCount, deleted from lz_blog.tags where deleted = 0;
+    </select>
+</mapper>

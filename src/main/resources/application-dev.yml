@@ -2,6 +2,8 @@ server:
   port: 8080
 
 spring:
+  mvc:
+    throw-exception-if-no-handler-found: true
   datasource:
     url: jdbc:mysql://localhost:3306/lz_blog?useUnicode=true&characterEncoding=utf8&useSSL=false
     username: root
@@ -10,12 +12,15 @@ spring:
     type: com.alibaba.druid.pool.DruidDataSource
   redis:
     host: 127.0.0.1
-    password: 123456
+#    password: Zyh20010605
     port: 6379
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
 
 mybatis:
   type-aliases-package: com.lan5th.blog.pojo
   mapper-locations: classpath:dao/*.xml
   configuration: #代替配置文件的功能
     map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 

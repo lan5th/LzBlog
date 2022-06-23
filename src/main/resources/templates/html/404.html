@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="/res/lib/layui/css/layui.css">
+    <link rel="stylesheet" href="/res/lib/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/res/css/site.css">
+    <link rel="stylesheet" href="/res/css/site-animate.css">
+    <link rel="stylesheet" href="/res/css/site-media.css">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/animate.css/3.5.2/animate.min.css" />
+    <link rel="stylesheet" href="/res/css/blog-pace.css" />
+    <script data-pace-options='{ "ajax": false ,"eventLag": false}' src="/res/js/pace.min.js"></script>
+    <script src="/res/lib/layui/layui.js"></script>
+    <style>
+        .remark-list {
+            min-height: 445px;
+        }
+
+        .remark-list li {
+            position: relative;
+            min-height: 50px;
+            margin: 5px 0;
+        }
+
+        .remark-list li .user-avator {
+            padding: 2px;
+            border: 1px solid #ddd;
+            position: absolute;
+        }
+
+        .remark-list li .remark-content {
+            margin-left: 60px;
+            border: 1px solid #efefef;
+            height: 46px;
+            padding: 5px 8px;
+            -moz-box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            box-sizing: border-box;
+            font-size: 12px;
+            overflow: hidden;
+            line-height: 18px;
+            background-color: #efefef;
+            color: #666;
+        }
+
+        .remark-list li .remark-content::after {
+            content: "";
+            border: 10px solid rgba(255, 255, 255, 0.00);
+            border-bottom: 8px solid rgba(255, 255, 255, 0.00);
+            border-top: 8px solid rgba(255, 255, 255, 0.00);
+            border-right-color: #efefef;
+            position: absolute;
+            top: 12px;
+            left: 42px;
+            display: block;
+        }
+
+        footer {
+            width: 100%;
+            position: absolute !important;
+            bottom: 0
+        }
+
+        #noResourceImg {
+            position:absolute;
+            top: 50px;
+            display: inline-block;
+            height: auto;
+            width: auto;
+        }
+    </style>
+</head>
+
+<body>
+<!-- 头部 -->
+<div id="head"></div>
+<img id="noResourceImg" src="/res/images/404.jpeg">
+<!-- 底部 -->
+<div id="foot"></div>
+<!-- 移动端侧边导航 -->
+<div id="side"></div>
+<!-- 侧边导航遮罩 -->
+<div class="blog-mask animated layui-hide"></div>
+<script src="/res/lib/jquery.min.js"></script>
+<!-- 引用公共资源 -->
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#foot").load("/html/foot.html");
+        $("#head").load("/html/head.html");
+        $("#layout").load("/html/layout.html");
+        $("#side").load("/html/side.html");
+    });
+
+    let imgHeight = window.innerHeight - 143;
+    let modifiedImgWidth = imgHeight * 1024 / 682;
+    let imgLeftPosition = (window.innerWidth - modifiedImgWidth) / 2;
+    document.getElementById("noResourceImg").style.height = imgHeight + "px";
+    document.getElementById("noResourceImg").style.left = imgLeftPosition + "px";
+</script>
+<script src="https://cdn.bootcss.com/scrollReveal.js/3.3.6/scrollreveal.js"></script>
+<script src="/res/js/site.js"></script>
+</body>
+
+</html>

@@ -591,8 +591,8 @@ body .share .layui-layer-content {
             }
 
     .article > .article-right {
-        width: 73%;
-        float: right;
+        /*width: 73%;*/
+        /*float: right;*/
         padding-left: 2%;
     }
 
@@ -1181,7 +1181,7 @@ body .share .layui-layer-content {
     }
 
     .blogerinfo-info {
-        width: 232px;
+        width: 300px;
     }
 
     .blogerinfo-contact > a {
