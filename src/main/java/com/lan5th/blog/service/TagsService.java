@@ -12,5 +12,7 @@ import java.util.List;
 public interface TagsService {
     List<Tag> getAllTags();
     
-    List<BlogDetail> getBlogList4Tag(Integer pageNum, Integer pageSize, String tagId);
+    List<BlogDetail> getBlogList4Tag(Integer pageNum, Integer pageSize, Long tagId);
+    
+    Integer getAllTagCount();
 }

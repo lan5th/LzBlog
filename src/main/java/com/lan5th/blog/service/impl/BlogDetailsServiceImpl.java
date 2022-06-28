@@ -80,7 +80,7 @@ public class BlogDetailsServiceImpl implements BlogDetailsService {
             fileReader.close();
             bufferedReader.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            System.out.println("文件不存在，博客id:" + id);;
         } catch (IOException e) {
             e.printStackTrace();
         }

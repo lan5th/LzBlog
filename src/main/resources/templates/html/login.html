@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Lz不落阁</title>
+    <link rel="stylesheet" href="/res/lib/layui/css/layui.css">
+    <link rel="stylesheet" href="/res/lib/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/res/css/site.css">
+    <link rel="stylesheet" href="/res/css/site-animate.css">
+    <link rel="stylesheet" href="/res/css/site-media.css">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/animate.css/3.5.2/animate.min.css"/>
+    <link rel="stylesheet" href="/res/css/blog-pace.css"/>
+    <script data-pace-options='{ "ajax": false ,"eventLag": false}' src="/res/js/pace.min.js"></script>
+    <script src="/res/lib/layui/layui.js"></script>
+    <style type="text/css">
+        #login-inform {
+            color: red;
+            padding: 9px 15px 9px 15px;
+        }
+    </style>
+</head>
+
+<body>
+<!-- 头部 -->
+<div id="head"></div>
+<!-- 主体 -->
+<div class="blog-body" id="main-body">
+    <div class="layui-container">
+        <div class="layui-row layui-col-space15">
+            <form class="layui-form" action="">
+                <div class="layui-form-item">
+                    <div id="login-inform">暂时仅支持管理员账号登录</div>
+                    <label class="layui-form-label">账号</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="userId" required lay-verify="required" placeholder="请输入用户id"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">密码</label>
+                    <div class="layui-input-inline">
+                        <input type="password" name="password" required lay-verify="required" placeholder="请输入密码"
+                               autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit lay-filter="formDemo">登录</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- 底部 -->
+<div id="foot"></div>
+<!-- 移动端侧边导航 -->
+<div id="side"></div>
+<!-- 侧边导航遮罩 -->
+<div class="blog-mask animated layui-hide"></div>
+<script src="/res/lib/jquery.min.js"></script>
+<!-- 引用公共资源 -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#foot").load("/html/foot.html");
+        $("#head").load("/html/head.html");
+        $("#layout").load("/html/layout.html");
+        $("#side").load("/html/side.html");
+    });
+
+    //Demo
+    layui.use('form', function () {
+        var form = layui.form;
+
+        //提交
+        form.on('submit(formDemo)', function (data) {
+            // layer.msg(JSON.stringify(data.field));
+            //base64加密
+            let convertPass = window.btoa(data.field.password);
+            let userId = data.field.userId;
+            $.ajax({
+                data: {
+                    userId: userId,
+                    password: convertPass
+                },
+                type: "POST",                //请求方式
+                url: "/user/auth",                 //路径
+                async: false,             //是否异步
+                dataType: "json",        //返回数据的格式
+                success: function (res) {  //成功的回调函数
+                    const token = res.data.token;
+                    localStorage.setItem('login-token', token);
+                    if (token != null) {
+                        window.location.href = '/';
+                    } else {
+                        alert('用户名或密码错误!');
+                    }
+                },
+                error: function () {
+                    layer.msg("服务器错误！");
+                }
+            })
+            return false;
+        });
+    });
+</script>
+<script src="https://cdn.bootcss.com/scrollReveal.js/3.3.6/scrollreveal.js"></script>
+<script src="/res/js/site.js"></script>
+<script src="/res/js/homepage.js"></script>
+</body>
+
+</html>

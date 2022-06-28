@@ -94,24 +94,7 @@
                                 <a target="_blank" title="GitHub" href="https://github.com/lan5th"><i
                                         class="fa fa-github fa-2x"></i></a>
                             </div>
-                            <div class="bloginfo-statistics">
-                                <div class="item">
-                                    <span>12</span>
-                                    <p>博文</p>
-                                </div>
-                                <div class="item">
-                                    <span>12</span>
-                                    <p>分类</p>
-                                </div>
-                                <div class="item">
-                                    <span>12</span>
-                                    <p>评论</p>
-                                </div>
-                                <div class="item">
-                                    <span>12</span>
-                                    <p>留言</p>
-                                </div>
-                            </div>
+                            <div class="bloginfo-statistics"></div>
                             <div class="bloginfo-runtime">博客已运行<span style="margin-left:4px;">583天14时17分38秒</span>
                             </div>
                         </div>
@@ -191,14 +174,36 @@
 <div class="blog-mask animated layui-hide"></div>
 <script src="/res/lib/jquery.min.js"></script>
 <script src="/res/js/index.js"></script>
+<!--<script src="/res/js/common.js"></script>-->
 <!-- 引用公共资源 -->
 <script type="text/javascript">
     $(document).ready(function() {
+        topBlog();
         $("#foot").load("/html/foot.html");
-        $("#head").load("/html/head.html");
+        $("#head").load("/html/head.html", function () {
+            // headFunction();
+            let html = "";
+            let user = JSON.parse(localStorage.getItem('user'));
+            if (user != null) {
+                html += "<!-- 登陆后 -->\n" +
+                    "    <span class=\"blog-user\">\n" +
+                    "        <a href=\"javascript:logout()\">\n" +
+                    "           <img src=\"" + user.avatarUrl + "\" alt=\"\" title=\"\" />\n" +
+                    "        </a>\n" +
+                    "        <span style='color: white'>" + user.name + "</span>\n" +
+                    "    </span>\n";
+            } else {
+                html += "<!-- 未登陆 -->\n" +
+                    "    <a href=\"/user/login\" class=\"blog-user\">\n" +
+                    "        <i class=\"fa fa-qq\"></i>\n" +
+                    "        <span>登录</span>\n" +
+                    "    </a>\n"
+            }
+            console.log(user);
+            document.getElementById("user-info-block").innerHTML = html;
+        });
         $("#layout").load("/html/layout.html");
         $("#side").load("/html/side.html");
-        topBlog();
     });
 </script>
 <script src="https://cdn.bootcss.com/scrollReveal.js/3.3.6/scrollreveal.js"></script>

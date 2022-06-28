@@ -17,7 +17,7 @@ import org.springframework.web.servlet.ModelAndView;
 @RequestMapping("/details")
 public class BlogDetailsController {
     @Autowired
-    BlogDetailsService blogDetailsService;
+    private BlogDetailsService blogDetailsService;
 
     @RequestMapping(value = "/{articleId}", method = RequestMethod.GET)
     public ModelAndView details(@PathVariable("articleId") long articleId) {

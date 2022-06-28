@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author lan5th
  * @date 2022/6/23 21:40
  */
+@Deprecated
 @Component
 public class UserInterceptor implements HandlerInterceptor {
     @Override

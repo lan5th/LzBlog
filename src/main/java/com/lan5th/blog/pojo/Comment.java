@@ -12,7 +12,7 @@ import java.util.Date;
 @Data
 public class Comment {
     private Long id;
-    //blogId为0是表示留言，不为0时表示博客评论
+    //blogId为-1是表示留言，不为0时表示博客评论
     private Long blogId;
     private String content;
     private Date createTime;

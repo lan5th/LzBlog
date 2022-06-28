@@ -177,7 +177,9 @@
 <script type="text/javascript">
     $(document).ready(function() {
         $("#foot").load("/html/foot.html");
-        $("#head").load("/html/head.html");
+        $("#head").load("/html/head.html", function () {
+            headFunction();
+        });
         $("#layout").load("/html/layout.html");
         $("#side").load("/html/side.html");
     });

@@ -24,7 +24,7 @@ public interface BlogMapper {
 
     void physicalRemoveByIds(List<Long> id);
     
-    List<BlogDetail> getPagination(Integer preNum, Integer postNum, String tagId);
+    List<BlogDetail> getPagination(Integer preNum, Integer postNum, Long tagId);
     
     List<BlogDetail> getByIds(List<Long> ids);
     

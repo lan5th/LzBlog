@@ -7,6 +7,7 @@ import java.lang.annotation.Target;
  * @author lan5th
  * @date 2022/6/23 21:40
  */
+@Deprecated
 @Target({ElementType.TYPE, ElementType.METHOD})
 public @interface RequireToken {
     boolean required() default true;

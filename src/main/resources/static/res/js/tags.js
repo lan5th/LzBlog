@@ -74,8 +74,6 @@ function changeTag(tagId) {
             limit: 10,
             jump: function(obj, first){
                 //obj包含了当前分页的所有参数，比如：
-                console.log(obj.curr); //得到当前页，以便向服务端请求对应页的数据。
-                console.log(obj.limit); //得到每页显示的条数
                 blogListForTag(obj.curr, obj.limit, tagId);
             }
         });
@@ -83,7 +81,11 @@ function changeTag(tagId) {
 }
 
 function getAllTags() {
+    let token = localStorage.getItem("login-token");
     $.ajax({
+        headers: {
+            'token': token
+        },
         type:"GET",                //请求方式
         url:"/index/allTags",                 //路径
         async:true,             //是否异步
@@ -113,4 +115,15 @@ function getAllTags() {
     })
 }
 
-
+function confirm(id, action) {
+    switch (action) {
+        case 'updateBlog':
+            break;
+        case 'deleteBlog':
+            break;
+        case 'setTop':
+            break;
+        case 'cancelTop':
+            break;
+    }
+}

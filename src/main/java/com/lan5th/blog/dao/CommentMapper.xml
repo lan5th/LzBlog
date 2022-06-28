@@ -4,25 +4,49 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lan5th.blog.dao.CommentMapper">
     <update id="update" parameterType="com.lan5th.blog.pojo.Comment">
-        update lz_blog.commet set blog_id = #{blog_id}, content = #{content}, user_id = #{userId} where id = #{id} and deleted = 0;
+        update lz_blog.comment set blog_id = #{blog_id}, content = #{content}, user_id = #{userId} where id = #{id} and deleted = 0;
     </update>
 
     <insert id="save" parameterType="com.lan5th.blog.pojo.Comment">
-        insert into lz_blog.commet(id, blog_id, content, user_id) VALUES (#{id}, #{blogId}, #{content}, #{userId});
+        insert into lz_blog.comment(id, blog_id, content, user_id) VALUES (#{id}, #{blogId}, #{content}, #{userId});
     </insert>
 
     <update id="deleteByIds" parameterType="list">
-        update lz_blog.commet set deleted = 1 where id in
+        update lz_blog.comment set deleted = 1 where id in
         <foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
             #{id}
         </foreach>
     </update>
 
     <select id="getPagination" resultType="com.lan5th.blog.pojo.Comment">
-        select * from lz_blog.commet as c1
-        where c1.id in (select c3.id from (select c2.id from lz_blog.blogs as c2 where c2.deleted = 0 order by create_time desc limit #{preNum}, #{postNum}) as c3)
-        <if test="blogId != null">
-            and c1.blog_id = #{blogId}
-        </if>
+        select * from lz_blog.comment as c1
+        where c1.id in (select c3.id from (select c2.id from lz_blog.blogs as c2
+        <where>
+            <choose>
+                <when test="blogId != null">
+                    c2.blog_id = #{blogId}
+                </when>
+                <otherwise>
+                    blog_id != -1
+                </otherwise>
+            </choose>
+            c2.deleted = 0
+        </where>
+        order by c2.create_time desc limit #{preNum}, #{postNum}) as c3) order by c1.create_time;
+    </select>
+
+    <select id="getCommentCount" resultType="integer">
+        select COUNT(1) from lz_blog.comment
+        <where>
+            <choose>
+                <when test="blogId != null">
+                    blog_id = #{blogId}
+                </when>
+                <otherwise>
+                    blog_id != -1
+                </otherwise>
+            </choose>
+            and deleted = 0;
+        </where>
     </select>
 </mapper>

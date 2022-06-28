@@ -23,8 +23,8 @@ public class MvcConfig {
              */
             @Override
             public void addViewControllers(ViewControllerRegistry registry) {
-                registry.addViewController("/").setViewName("html/index");
-                registry.addViewController("/index.html").setViewName("html/index");
+                registry.addViewController("/").setViewName("/html/index");
+                registry.addViewController("/index.html").setViewName("/html/index");
             }
 
 //            /**

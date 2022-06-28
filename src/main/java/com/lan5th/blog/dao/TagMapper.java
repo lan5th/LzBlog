@@ -13,7 +13,7 @@ import java.util.List;
 @Mapper
 @Component
 public interface TagMapper {
-    Tag getById(long id);
+    Tag getById(Long id);
     
     void update(Tag blogDetail);
     

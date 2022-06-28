@@ -30,4 +30,8 @@
         </foreach>
         and deleted = 0;
     </select>
+
+    <select id="auth" resultType="com.lan5th.blog.pojo.UserAuth">
+        select * from lz_blog.user_auth where id = #{id} and deleted = false;
+    </select>
 </mapper>

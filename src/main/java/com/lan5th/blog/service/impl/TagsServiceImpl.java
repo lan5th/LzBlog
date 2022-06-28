@@ -20,11 +20,11 @@ public class TagsServiceImpl implements TagsService {
     private static final String TAGS_KEY = "tags";
     private static final int EXPIRE_TIME = 10;
     @Autowired
-    RedisUtil redisUtil;
+    private RedisUtil redisUtil;
     @Autowired
-    TagMapper tagMapper;
+    private TagMapper tagMapper;
     @Autowired
-    BlogsService blogsService;
+    private BlogsService blogsService;
     
     @Override
     public List<Tag> getAllTags() {
@@ -37,12 +37,17 @@ public class TagsServiceImpl implements TagsService {
     }
     
     @Override
-    public List<BlogDetail> getBlogList4Tag(Integer pageNum, Integer pageSize, String tagId) {
+    public List<BlogDetail> getBlogList4Tag(Integer pageNum, Integer pageSize, Long tagId) {
         List<BlogDetail> list = null;
         if ((list = (List<BlogDetail>) redisUtil.get(TAGS_KEY + "-" + tagId + "-" + pageNum + "-" + pageSize)) == null) {
             list = blogsService.instantGetBlogsByPage(pageNum, pageSize, tagId);
             redisUtil.set(TAGS_KEY + "-" + tagId + "-" + pageNum + "-" + pageSize, list, 10);
         }
         return list;
+    }
+    
+    @Override
+    public Integer getAllTagCount() {
+        return getAllTags().size();
     }
 }

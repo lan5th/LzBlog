@@ -1,17 +1,8 @@
 <!-- 头部 -->
 <nav class="blog-nav layui-header">
     <div class="layui-container">
-        <!-- 登陆后 -->
-        <!-- <span class="blog-user">
-                <a href="/user/logout?returnUrl=@returnUrl">
-                    <img src="#" alt="" title="" />
-                </a>
-            </span> -->
-        <!-- 未登陆 -->
-        <a href="javacript:;" class="blog-user">
-            <i class="fa fa-qq"></i>
-            <span>登录</span>
-        </a>
+        <!-- 登录信息/登录页面 -->
+        <div id="user-info-block"></div>
         <a class="blog-logo" href="/">Lz不落阁</a>
         <ul class="blog-nav-list" lay-filter="nav">
             <li class="layui-nav-item">
@@ -35,3 +26,48 @@
         </a>
     </div>
 </nav>
+
+<script type="text/javascript">
+    //这里必须在$().load('head',function)的回调函数里面才能使用
+    function headFunction() {
+        let html = "";
+        let user = JSON.parse(localStorage.getItem('user'));
+        if (user != null) {
+            html += "<!-- 登陆后 -->\n" +
+                "    <span class=\"blog-user\">\n" +
+                "        <a href=\"javascript:logout()\">\n" +
+                "           <img src=\"" + user.avatarUrl + "\" alt=\"\" title=\"\" />\n" +
+                "        </a>\n" +
+                "        <span style='color: white'>" + user.name + "</span>\n" +
+                "    </span>\n";
+        } else {
+            html += "<!-- 未登陆 -->\n" +
+                "    <a href=\"/user/login\" class=\"blog-user\">\n" +
+                "        <i class=\"fa fa-qq\"></i>\n" +
+                "        <span>登录</span>\n" +
+                "    </a>\n"
+        }
+        console.log(user);
+        document.getElementById("user-info-block").innerHTML = html;
+    }
+
+    function logout() {
+        let token = localStorage.getItem("login-token");
+        if (token != null) {
+            console.log(token);
+            $.ajax({
+                headers: {
+                    'token': token
+                },
+                type:"GET",                //请求方式
+                url:"/user/logout",                 //路径
+                async:false,             //是否异步
+                dataType:"json",        //返回数据的格式
+                success:function(res){}
+            })
+        }
+        localStorage.removeItem('login-token');
+        localStorage.removeItem('user');
+        window.location.href="/";
+    }
+</script>

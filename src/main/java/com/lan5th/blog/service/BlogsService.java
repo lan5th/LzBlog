@@ -40,5 +40,5 @@ public interface BlogsService {
      * @param tagId
      * @return
      */
-    List<BlogDetail> instantGetBlogsByPage(Integer pageNum, Integer pageSize, String tagId);
+    List<BlogDetail> instantGetBlogsByPage(Integer pageNum, Integer pageSize, Long tagId);
 }

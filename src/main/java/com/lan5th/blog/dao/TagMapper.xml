@@ -3,16 +3,17 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lan5th.blog.dao.TagMapper">
-    <select id="getById" parameterType="long" resultType="com.lan5th.blog.pojo.Tag">
-        select * from lz_blog.tags where id = #{id} and deleted = 0;
+    <select id="getById" parameterType="long" resultMap="tagBo">
+        SELECT t.id, t.tag_name, t.create_time, t.deleted, COUNT(1) FROM lz_blog.tags t, lz_blog.blogs b WHERE t.id = #{id} AND t.id = b.tag_id and t.deleted = 0 AND b.deleted = 0 GROUP BY t.id;
+
     </select>
 
     <update id="update" parameterType="com.lan5th.blog.pojo.Tag">
-        update lz_blog.tags set tag_name = #{tagName}, blogCount = #{blogCount} where id = #{id} and deleted = 0;
+        update lz_blog.tags set tag_name = #{tagName} where id = #{id} and deleted = 0;
     </update>
 
     <insert id="save" parameterType="com.lan5th.blog.pojo.Tag">
-        insert into lz_blog.tags(id, tag_name, blogCount) VALUES (#{id}, #{tagName}, #{blogCount});
+        insert into lz_blog.tags(id, tag_name) VALUES (#{id}, #{tagName});
     </insert>
 
     <update id="deleteByIds" parameterType="list">
@@ -23,7 +24,15 @@
     </update>
 
     <!--这里注意resultType是list里面的类型，而不是java.util.list-->
-    <select id="getAllTags" resultType="com.lan5th.blog.pojo.Tag">
-        select id, tag_name, create_time, blogCount, deleted from lz_blog.tags where deleted = 0;
+    <select id="getAllTags" resultMap="tagBo">
+        SELECT t.id, t.tag_name, t.create_time, t.deleted, COUNT(1) FROM lz_blog.tags t, lz_blog.blogs b WHERE t.id = b.tag_id AND t.deleted = 0 AND b.deleted = 0 GROUP BY t.id;
     </select>
+
+    <resultMap id="tagBo" type="com.lan5th.blog.pojo.Tag">
+        <result property="id" column="id"/>
+        <result property="tagName" column="tag_name"/>
+        <result property="createTime" column="create_time"/>
+        <result property="deleted" column="deleted"/>
+        <result property="blogCount" column="COUNT(1)"/>
+    </resultMap>
 </mapper>

@@ -23,11 +23,11 @@ public class BlogsServiceImpl implements BlogsService {
     //过期时间
     private static final int EXPIRE_TIME = 10;
     @Autowired
-    BlogMapper blogMapper;
+    private BlogMapper blogMapper;
     @Autowired
-    RedisUtil redisUtil;
+    private RedisUtil redisUtil;
     @Autowired
-    TagMapper tagMapper;
+    private TagMapper tagMapper;
     
     @Override
     public List<BlogDetail> getIndexBlogs(int pageNum, int pageSize) {
@@ -79,7 +79,7 @@ public class BlogsServiceImpl implements BlogsService {
         return totalCount;
     }
     
-    public List<BlogDetail> instantGetBlogsByPage(Integer pageNum, Integer pageSize, String tagId) {
+    public List<BlogDetail> instantGetBlogsByPage(Integer pageNum, Integer pageSize, Long tagId) {
         if (pageNum < 1 || pageSize < 1)
             return null;
         return blogMapper.getPagination((pageNum - 1) * pageSize, pageNum * pageSize, tagId);
