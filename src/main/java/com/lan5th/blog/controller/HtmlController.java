@@ -35,4 +35,7 @@ public class HtmlController {
     
     @RequestMapping("/404")
     public String errorHandle() { return "html/404"; }
+    
+    @RequestMapping("/about")
+    public String about() { return "html/about"; }
 }

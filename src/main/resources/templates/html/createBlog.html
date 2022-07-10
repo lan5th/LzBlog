@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Lz不落阁</title>
+    <link rel="stylesheet" href="/res/lib/layui/css/layui.css">
+    <link rel="stylesheet" href="/res/lib/font-awesome/css/font-awesome.css">
+    <link rel="stylesheet" href="/res/css/site.css">
+    <link rel="stylesheet" href="/res/css/site-animate.css">
+    <link rel="stylesheet" href="/res/css/site-media.css">
+    <link rel="stylesheet" href="https://cdn.bootcss.com/animate.css/3.5.2/animate.min.css"/>
+    <link rel="stylesheet" href="/res/css/blog-pace.css"/>
+    <script data-pace-options='{ "ajax": false ,"eventLag": false}' src="/res/js/pace.min.js"></script>
+    <script src="/res/lib/layui/layui.js"></script>
+    <style type="text/css">
+        #login-inform {
+            color: red;
+            padding: 9px 15px 9px 15px;
+        }
+    </style>
+</head>
+
+<body>
+<!-- 头部 -->
+<div id="head"></div>
+<!-- 主体 -->
+<div class="blog-body" id="main-body">
+    <div id="content-body" class="layui-container">
+        <div class="layui-row layui-col-space15">
+            <form class="layui-form" action="" enctype=“multipart/form-data”>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">文章标题</label>
+                    <div class="layui-input-block">
+                        <input id="title" type="text" name="title" required  lay-verify="required" placeholder="请输入标题" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item layui-col-xs5 layui-col-sm5 layui-col-md5" >
+                    <label class="layui-form-label">分类</label>
+                    <div class="layui-input-block">
+                        <select id="tags" name="tagId">
+                            <option value="cs1">cs1</option>
+                            <option value="cs2">cs2</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-form-item layui-col-xs5 layui-col-sm5 layui-col-md5">
+                    <label class="layui-form-label">新建分类？</label>
+                    <div class="layui-input-block">
+                        <input id="newTagName" type="text" name="newTagName" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">简短描述(150字以内)</label>
+                    <div class="layui-input-block">
+                        <textarea id="shortContent" name="shortContent" placeholder="请输入内容" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">markdown</label>
+                    <button type="button" class="layui-btn" id="blogFile">
+                        <i class="layui-icon">&#xe705;</i>上传markdown
+                    </button>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button id="commit-btn" class="layui-btn" lay-submit lay-filter="saveBlog">保存</button>
+                        <button onclick="resetData()" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+            <!-- 填充块 -->
+<!--            <div style="height: ">-->
+<!--            </div>-->
+        </div>
+    </div>
+</div>
+<!-- 底部 -->
+<div id="foot"></div>
+<!-- 移动端侧边导航 -->
+<div id="side"></div>
+<!-- 侧边导航遮罩 -->
+<div class="blog-mask animated layui-hide"></div>
+<script src="/res/lib/jquery.min.js"></script>
+<script src="/res/js/tags.js"></script>
+<!-- 引用公共资源 -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#foot").load("/html/foot.html");
+        $("#head").load("/html/head.html", function () {
+            headFunction();
+        });
+        $("#layout").load("/html/layout.html");
+        $("#side").load("/html/side.html");
+
+        //填充页面
+        let bodyHeight = window.innerHeight - 140;
+        document.getElementById("content-body").style.height = bodyHeight + "px";
+
+        window.blogId = "";
+        if ("[[${blogId}]]" != "") {
+            window.blogId = "[[${blogId}]]";
+        }
+
+        $.ajax({
+            headers: {
+                'token': localStorage.getItem('login-token')
+            },
+            data: {
+                'blogId': window.blogId
+            },
+            type: "get",                //请求方式
+            url: "/index/allTags",                 //路径
+            async: false,             //是否异步
+            dataType: "json",        //返回数据的格式
+            success: function (res) {
+                //登录验证
+                let user = res.data.user;
+                if (user == null) {
+                    alert("您的登录已经失效，请重新登录");
+                    window.location.href = '/';
+                }
+
+                //获取旧博客数据(新建则为null)
+                window.oldBlog = res.data.oldBlog;
+                window.allTags = res.data.allTags;
+
+                resetData();
+                //layui重新刷新select
+                form = layui.form;
+                form.render('select');
+            },
+            error: function () {
+                alert("获取tag信息失败!");
+            }
+        });
+
+        initPage();
+    });
+</script>
+<script src="/res/js/createPage.js"></script>
+<script src="https://cdn.bootcss.com/scrollReveal.js/3.3.6/scrollreveal.js"></script>
+<script src="/res/js/site.js"></script>
+<script src="/res/js/homepage.js"></script>
+</body>
+
+</html>

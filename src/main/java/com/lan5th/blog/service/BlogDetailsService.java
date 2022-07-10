@@ -12,21 +12,21 @@ public interface BlogDetailsService {
      * @param id
      * @return
      */
-    BlogDetail getBlogDetail(long id);
+    BlogDetail getBlogDetail(String id);
     
     /**
      * 获取博客正文markdown
      * @param id
      * @return
      */
-    String getContent(long id);
+    String getContent(String id);
     
     /**
      * 创建博客(需要另外上传markdown文件)
      * @param blogDetail
      * @return
      */
-    String newBlog(BlogDetail blogDetail);
+    String create(BlogDetail blogDetail);
     
     /**
      * 更新博客(需要另外更新markdown文件)
@@ -38,7 +38,7 @@ public interface BlogDetailsService {
     /**
      * 删除博客
      * @param id
-     * @return
+     * @return 为null则删除成功
      */
-    String deleteBlog(long id);
+    String deleteBlog(String id);
 }

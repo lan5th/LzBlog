@@ -24,10 +24,14 @@ public interface UserMapper {
     
     void deleteByIds(List<Long> ids);
     
+    //------------------------分界线,上面是userInfo表操作,下面是user_auth表操作-------------------------
+    
     /**
      * 从user_auth表中获取认证信息
      * @param Id
      * @return
      */
     UserAuth auth(long Id);
+    
+    void saveAuth(UserAuth auth);
 }

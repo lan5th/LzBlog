@@ -14,13 +14,15 @@ import java.util.List;
 @Mapper
 @Component
 public interface BlogMapper {
-    BlogDetail getById(long id);
+    BlogDetail getById(Long id);
+    
+    BlogDetail getById(Long id, Boolean ignoreDelete);
 
     void update(BlogDetail blogDetail);
 
     void save(BlogDetail blogDetail);
 
-    void deleteByIds(List<Long> id);
+    void deleteByIds(List<Long> ids);
 
     void physicalRemoveByIds(List<Long> id);
     

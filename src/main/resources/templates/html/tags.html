@@ -77,6 +77,7 @@
                             <div class="blog-card-title">
                                 <span class="icon"><i class="layui-icon" aria-hidden="true">&#xe653;</i></span>
                                 <span class="text">所有分类</span>
+                                <span id="manage-tags-span"></span>
                             </div>
                             <div style="margin: 10px">
                                 <div class="layui-btn-container"></div>
@@ -137,7 +138,9 @@
             <!--右侧展示文章列表-->
             <div class="layui-col-md8">
                 <div class="left-box">
-                    <p class="left-box-title shadow sr-listshow"><i class="fa fa-signal fa-fw" aria-hidden="true"></i>所有博文</p>
+                    <p id="tag-info" class="left-box-title shadow sr-listshow"><i class="fa fa-signal fa-fw" aria-hidden="true"></i>
+                        <span id="tag-name">所有博文</span>
+                    </p>
                     <div id="newest-blog-show"></div>
                     <div id="layui-page"></div>
                 </div>

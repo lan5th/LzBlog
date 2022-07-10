@@ -40,4 +40,6 @@ public interface CommentMapper {
      * @return
      */
     Integer getCommentCount(Long blogId);
+    
+    Comment getSingleComment(Long id);
 }

@@ -1,15 +1,18 @@
-function blogListForTag(pageNum, pageSize, tagId) {
+function blogListForTag(pageNum, pageSize, tag) {
     if (pageNum == null)
         pageNum = 1;
     if (pageSize == null)
         pageSize = 10;
-    if (tagId == null)
+    if (tag.id == null)
         return;
     $.ajax({
+        headers: {
+            'token':localStorage.getItem('login-token')
+        },
         data: {
             pageNum:pageNum,
             pageSize:pageSize,
-            tagId:tagId
+            tagId:tag.id
         },
         type:"GET",                //请求方式
         url:"/index/list",                 //路径
@@ -19,26 +22,66 @@ function blogListForTag(pageNum, pageSize, tagId) {
             //具体内容
             let html = "";
             let list = res.data.list;
-            for (let i in list) {
-                let detail = list[i];
-                html += "<div class=\"article shadow clearfix sr-listshow\">\n" +
-                    "        <div class=\"article-right\">\n" +
-                    "            <div class=\"article-title\">\n" +
-                    "                <a href=\"/details/" + detail.id + "\">" + detail.blogName + "</a>\n" +
-                    "            </div>\n" +
-                    "            <div class=\"article-abstract\">\n"  + detail.shortContent + "\n" +
-                    "            </div>\n" +
-                    "            <div class=\"article-footer\">\n" +
-                    "                <span class=\"layui-hide-xs\"><i class=\"fa fa-tag\" aria-hidden=\"true\"></i>&nbsp;<a\n" +
-                    "                        style=\"color:#009688\" href=\"\">" + detail.tagName + "\n" +
-                    "                        </a></span>\n" +
-                    "                <span><i class=\"fa fa-clock-o\" aria-hidden=\"true\"></i>&nbsp;" + detail.createTime + "</span>\n" +
-                    "                <a class=\"read layui-btn layui-btn-xs layui-btn-normal layui-hide-xs\"\n" +
-                    "                   href=\"/details/" + detail.id + "\" title=\"" + detail.blogName + "\">阅读全文</a>\n" +
-                    "            </div>\n" +
-                    "        </div>\n" +
-                    "    </div>";
+            let user = res.data.user;
+            let isAdmin = false;
+            if (user != null && user.isAdmin == true)
+                isAdmin = true;
+            if (isAdmin) {
+                //管理按钮
+                $("#tag-info").html("<span id=\"tag-name\">" + tag.tagName + "</span>\n" +
+                "                    <a href=\"javascript:updateTag(" + tag.id + ")\" style=\"color:#009688\">更新分类名称</a>\n" +
+                "                    <a href=\"/details/create/\" style=\"float:right; color:#009688\">新建博客</a>\n");
+
+                //管理员界面
+                for (let i in list) {
+                    let detail = list[i];
+                    html += "<div class=\"article shadow clearfix sr-listshow\">\n" +
+                        "        <div class=\"article-right\">\n" +
+                        "            <div class=\"article-title\">\n" +
+                        "                <a href=\"/details/" + detail.id + "\">" + detail.blogName + "</a>\n" +
+                        "                <a href=\"javascript:actionConfirm(" + detail.id + ", 'setTop')\" style='float:right; color:#009688; font-size: 14px'>置顶</a>" +
+                        "            </div>\n" +
+                        "            <div class=\"article-abstract\">\n"  + detail.shortContent + "\n" +
+                        "            </div>\n" +
+                        "            <div class=\"article-footer\">\n" +
+                        "                <span class=\"layui-hide-xs\"><i class=\"fa fa-tag\" aria-hidden=\"true\"></i>&nbsp;<a\n" +
+                        "                        style=\"color:#009688\" href=\"\">" + detail.tagName + "\n" +
+                        "                        </a></span>\n" +
+                        "                <span><i class=\"fa fa-clock-o\" aria-hidden=\"true\"></i>&nbsp;" + detail.createTime + "</span>\n" +
+                        "                <a class=\"read layui-btn layui-btn-xs layui-btn-normal layui-hide-xs\"\n style='margin-left: 10px'" +
+                        "                   href=\"/details/update/" + detail.id + "\" title=\"" + detail.blogName + "\">更新博文</a>\n" +
+                        "                <a class=\"read layui-btn layui-btn-xs layui-btn-normal layui-hide-xs\"\n" +
+                        "                   href=\"javascript:actionConfirm(" + detail.id + ", 'deleteBlog')\" title=\"" + detail.blogName + "\">删除博文</a>\n" +
+                        "                <a class=\"read layui-btn layui-btn-xs layui-btn-normal layui-hide-xs\"\n" +
+                        "                   href=\"/details/" + detail.id + "\" title=\"" + detail.blogName + "\">阅读全文</a>\n" +
+                        "            </div>\n" +
+                        "        </div>\n" +
+                        "    </div>";
+                }
+            } else {
+                //访客和一般用户界面
+                for (let i in list) {
+                    let detail = list[i];
+                    html += "<div class=\"article shadow clearfix sr-listshow\">\n" +
+                        "        <div class=\"article-right\">\n" +
+                        "            <div class=\"article-title\">\n" +
+                        "                <a href=\"/details/" + detail.id + "\">" + detail.blogName + "</a>\n" +
+                        "            </div>\n" +
+                        "            <div class=\"article-abstract\">\n"  + detail.shortContent + "\n" +
+                        "            </div>\n" +
+                        "            <div class=\"article-footer\">\n" +
+                        "                <span class=\"layui-hide-xs\"><i class=\"fa fa-tag\" aria-hidden=\"true\"></i>&nbsp;<a\n" +
+                        "                        style=\"color:#009688\" href=\"\">" + detail.tagName + "\n" +
+                        "                        </a></span>\n" +
+                        "                <span><i class=\"fa fa-clock-o\" aria-hidden=\"true\"></i>&nbsp;" + detail.createTime + "</span>\n" +
+                        "                <a class=\"read layui-btn layui-btn-xs layui-btn-normal layui-hide-xs\"\n" +
+                        "                   href=\"/details/" + detail.id + "\" title=\"" + detail.blogName + "\">阅读全文</a>\n" +
+                        "            </div>\n" +
+                        "        </div>\n" +
+                        "    </div>";
+                }
             }
+
             $('#newest-blog-show').html(html);
         },
         error:function () {
@@ -69,22 +112,21 @@ function changeTag(tagId) {
 
         //执行一个laypage实例
         laypage.render({
-            elem: 'layui-page', //注意，这里的 test1 是 ID，不用加 # 号
+            elem: 'layui-page',
             count: targetTag.blogCount, //数据总数，从服务端得到
             limit: 10,
             jump: function(obj, first){
                 //obj包含了当前分页的所有参数，比如：
-                blogListForTag(obj.curr, obj.limit, tagId);
+                blogListForTag(obj.curr, obj.limit, targetTag);
             }
         });
     });
 }
 
 function getAllTags() {
-    let token = localStorage.getItem("login-token");
     $.ajax({
         headers: {
-            'token': token
+            'token': localStorage.getItem('login-token')
         },
         type:"GET",                //请求方式
         url:"/index/allTags",                 //路径
@@ -115,15 +157,41 @@ function getAllTags() {
     })
 }
 
-function confirm(id, action) {
-    switch (action) {
-        case 'updateBlog':
-            break;
-        case 'deleteBlog':
-            break;
-        case 'setTop':
-            break;
-        case 'cancelTop':
-            break;
-    }
+function updateTag(id) {
+    layer.prompt({title: '请输入新分类名', formType: 2}, function(tagName, index){
+        layer.close(index);
+        $.ajax({
+            headers: {
+                'token': localStorage.getItem('login-token')
+            },
+            data: {
+                id: id,
+                tagName: tagName
+            },
+            type:"POST",                //请求方式
+            url:"/index/updateTag",                 //路径
+            async:false,             //是否异步
+            dataType:"json",        //返回数据的格式
+            success:function(res){  //成功的回调函数
+                //渲染所有tag
+                if (res.status == 1) {
+                    layer.open({
+                        content: '更新分类成功'
+                        ,btn: ['确认']
+                        ,yes: function(index, layero){
+                            window.location.href = '/index/tags';
+                        }
+                        ,cancel: function(){
+                            return false; //开启该代码可禁止点击该按钮关闭
+                        }
+                    });
+                } else {
+                    layer.alert(res.message);
+                }
+            },
+            error:function () {
+                layer.alert('内部错误');
+            }
+        })
+    });
 }

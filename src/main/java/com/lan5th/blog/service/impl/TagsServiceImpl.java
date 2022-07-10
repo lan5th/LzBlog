@@ -9,6 +9,7 @@ import com.lan5th.blog.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,5 +50,44 @@ public class TagsServiceImpl implements TagsService {
     @Override
     public Integer getAllTagCount() {
         return getAllTags().size();
+    }
+    
+    @Override
+    public void saveTag(Tag tag) {
+        if (tag != null) {
+            tagMapper.save(tag);
+        }
+    }
+    
+    @Override
+    public String updateTag(String tagId, String tagName) {
+        Tag byId = tagMapper.getById(Long.parseLong(tagId));
+        if (byId == null) {
+            return "所选择的tag已被删除或不存在";
+        }
+        byId.setTagName(tagName);
+        tagMapper.update(byId);
+        return null;
+    }
+    
+    @Override
+    public String delTag(String tagId) {
+        ArrayList<Long> idList = new ArrayList<>();
+        idList.add(Long.parseLong(tagId));
+        tagMapper.deleteByIds(idList);
+        return null;
+    }
+    
+    @Override
+    public void cleanTagsCache() {
+        redisUtil.deleteByPrefix(TAGS_KEY);
+    }
+    
+    @Override
+    public Tag getTag(String id) {
+        if (id == null || id.length() == 0) {
+            return null;
+        }
+        return tagMapper.getById(Long.parseLong(id));
     }
 }

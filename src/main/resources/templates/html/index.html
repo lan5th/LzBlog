@@ -137,10 +137,7 @@
                                 <span class="text">友情链接</span>
                             </div>
                             <ul class="blogroll">
-                                <li><a target="_blank" href="https://www.leo96.com" title="燕十三">燕十三</a></li>
-                                <li><a target="_blank" href="https://www.leo96.com" title="神秘代码">神秘代码</a></li>
-                                <li><a target="_blank" href="https://www.leo96.com" title="懒得勤快">懒得勤快</a></li>
-                                <li><a target="_blank" href="https://www.leo96.com" title="臾离">臾离</a></li>
+                                <li><a target="_blank" href="https://lan5th.github.io/" title="github站">github站</a></li>
                             </ul>
                         </div>
                     </div>
@@ -181,26 +178,7 @@
         topBlog();
         $("#foot").load("/html/foot.html");
         $("#head").load("/html/head.html", function () {
-            // headFunction();
-            let html = "";
-            let user = JSON.parse(localStorage.getItem('user'));
-            if (user != null) {
-                html += "<!-- 登陆后 -->\n" +
-                    "    <span class=\"blog-user\">\n" +
-                    "        <a href=\"javascript:logout()\">\n" +
-                    "           <img src=\"" + user.avatarUrl + "\" alt=\"\" title=\"\" />\n" +
-                    "        </a>\n" +
-                    "        <span style='color: white'>" + user.name + "</span>\n" +
-                    "    </span>\n";
-            } else {
-                html += "<!-- 未登陆 -->\n" +
-                    "    <a href=\"/user/login\" class=\"blog-user\">\n" +
-                    "        <i class=\"fa fa-qq\"></i>\n" +
-                    "        <span>登录</span>\n" +
-                    "    </a>\n"
-            }
-            console.log(user);
-            document.getElementById("user-info-block").innerHTML = html;
+            headFunction();
         });
         $("#layout").load("/html/layout.html");
         $("#side").load("/html/side.html");

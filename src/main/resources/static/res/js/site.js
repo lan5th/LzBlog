@@ -1,4 +1,4 @@
-﻿/* 全局js
+﻿﻿/* 全局js
  * @Author: Leo 
  * @Date: 2019-10-09 11:36:17 
  * @Last Modified by:   Leo 
@@ -16,118 +16,8 @@ if (window.layui) {
             //评论页面和留言页面共用
             , editIndex = layedit.build('remarkEditor', {
                 height: 150,
-                tool: ['face', '|', 'left', 'center', 'right', '|', 'link'],
+                tool: null,
             });
-
-        var blog = {
-            openBlogHelper: function () {
-                //打开博客助手
-                var area, shade;
-                if (device.android || device.ios) {
-                    area = ['100vw', '100vh'];
-                    shade = 0;
-                } else {
-                    area = ['375px', '667px'];
-                    shade = 0.8;
-                }
-                layer.open({
-                    type: 2,
-                    title: false,
-                    closeBtn: 0,
-                    area: area,
-                    shade: shade,
-                    scrollbar: false,
-                    isOutAnim: false,
-                    anim: -1,
-                    resize: false,
-                    move: false,
-                    shadeClose: true,
-                    skin: 'blogzone animated flipInY',
-                    content: '/user/zone',
-                    success: function (layero, index) {
-                        blog.closeBlogHelper = function () {
-                            $(layero).removeClass('flipInY').addClass('flipOutY');
-                            setTimeout(function () {
-                                layer.close(index);
-                            }, 500);
-                        }
-                    }
-                });
-            }
-            
-            //单击事件定义
-            , events: {
-                //打开留言回复div
-                commentReply: function () {
-                    var commentId = $(this).data('id')
-                        , targetId = $(this).data('targetid')
-                        , targetName = $(this).data('targetname')
-                        , $comment = $(this).parents('.comment-item');
-                    //移除原有的回复编辑器
-                    $('#commentReplyEritor').remove();
-                    $('.comment-item').find('.btnDiv,.layui-layedit').remove();
-                    //拼接新的编辑器
-                    $comment.append('<textarea id="commentReplyEritor" style="display: none;"></textarea><div class="btnDiv" style="margin-left:-60px;padding:10px;"><button style="border-radius:0;" class="layui-btn layui-btn-xs layui-btn-normal">确定</button></div>');
-                    var editor = layedit.build('commentReplyEritor', {
-                        height: 80
-                        , tool: ['face', '|', 'link']
-                    });
-                    $('.comment-item .layui-layedit-tool').append('<span style="float: right;margin-right:5px;margin-top: 3px;font-size: 12px;color: #ff5722;">@' + targetName + '</span>');
-                    $('.comment-item').find('.btnDiv,.layui-layedit').click(function (e) {
-                        layui.stope(e);
-                    });
-                    //绑定确定按钮单击事件
-                    $('#commentReplyEritor').siblings('.btnDiv').find('.layui-btn').on('click', function () {
-                        var content = layedit.getContent(editor);
-                        if (content == "" || new RegExp("^[ ]+$").test(content)) {
-                            layer.msg('至少得有一个字吧', { shift: 6 });
-                            return;
-                        }
-                        var loading = layer.load(1);
-                        $.ajax({
-                            type: 'post'
-                            , url: '/api/comment/reply'
-                            , data: { remarkId: commentId, targetUserId: targetId, replyContent: content }
-                            , success: function (res) {
-                                layer.close(loading);
-                                if (res.code === 1) {
-                                    layer.msg('回复成功', { icon: 6 });
-                                    var reply = res.data;
-                                    //移除回复编辑器
-                                    $('#commentReplyEritor').remove();
-                                    $('.comment-item').find('.btnDiv,.layui-layedit').remove();
-                                    //拼接当前回复div
-                                    var html = '<div class="comment-reply"><div class="comment-item-left"><div class="useravator" title="{UserName}"><img src="{UserAvatar}" alt="{UserName}"></div></div><div class="comment-item-right"><div class="content"><span style="color:#01aaed;margin-right:5px">{UserName}：</span><span style="color:#ff6a00;margin-right:5px">@{TargetUserName}</span>{Content}</div><p class="createtime">{CreateTime}<a href="javascript:;" style="margin-left:5px;color:#0094ff;vertical-align:middle;display:none" blog-event="commentReply" data-id="{Id}" data-targetid="{UserId}" data-targetname="{UserName}">回复</a></p></div></div>'.replace(/{UserName}/g, reply.user.name).replace(/{UserId}/g, reply.user.id).replace(/{UserAvatar}/g, reply.user.avatar).replace(/{TargetUserName}/g, reply.targetUser.name).replace(/{Id}/g, reply.commentId).replace(/{Content}/g, reply.content).replace(/{CreateTime}/g, util.timeAgo(reply.createTime, false));
-
-                                    $comment.append(html);
-                                    //绑定事件
-                                    $comment.find('.comment-reply:last').on('mouseover', function () {
-                                        $(this).find('.createtime a').show();
-                                    }).on('mouseout', function () {
-                                        $(this).find('.createtime a').hide();
-                                    });
-                                    $comment.find('.comment-reply:last').find('*[blog-event]').on('click', function () {
-                                        var eventName = $(this).attr('blog-event');
-                                        typeof blog.events[eventName] == 'function' && blog.events[eventName].call(this);
-                                    });
-                                    $comment.find('.comment-reply:last').find('.createtime a').click(function (e) {
-                                        layui.stope(e);
-                                    });
-                                } else {
-                                    layer.msg(res.msg, { shift: 6, icon: 5 });
-                                }
-                            }
-                            , error: function (e) {
-                                layer.close(loading);
-                                layer.msg('程序出错了', { shift: 6, icon: 5 });
-                            }
-                        });
-                    });
-                }
-            }
-        };
-
-        window.blog = blog;
 
         //单击事件绑定
         $('*[blog-event]').on('click', function () {
@@ -135,118 +25,75 @@ if (window.layui) {
             typeof blog.events[eventName] == 'function' && blog.events[eventName].call(this);
         });
 
-        if (layui.cache.user) {
-            //工具块
-            util.fixbar({
-                bar1: "&#xe611;",
-                click: function (type) {
-                    if (type === 'bar1') {
-                        blog.openBlogHelper();
-                    }
-                }
-            });
-            //获取未读消息数量
-            $.get('/api/user/getunreadmsgcnt', function (res) {
-                if (res.code === 1 && res.data !== 0) {
-                    var $elemUser = $('.blog-user');
-                    var $msg;
-                    if (device.android || device.ios) {
-                        $msg = $('<span style="margin-left:8px;cursor:pointer;" class="blog-msg layui-badge">' + res.data + '</span>');
-                        $elemUser.append($msg);
-                    } else {
-                        $msg = $('<span style="margin-right:8px;cursor:pointer;" class="blog-msg layui-badge">' + res.data + '</span>');
-                        $elemUser.prepend($msg);
-                    }
-
-                    $msg.on('click', blog.openBlogHelper);
-
-                    layer.tips('你有 ' + res.data + ' 条未读消息', $msg, {
-                        tips: 3
-                        , tipsMore: true
-                        , fixed: true
-                    });
-                    $msg.on('mouseenter', function () {
-                        layer.closeAll('tips');
-                    })
-                }
-            });
-        } else {
-            util.fixbar({});
-        }
-
-        $(function () {
-            //滑动显示
-            if (!(/msie [6|7|8|9]/i.test(navigator.userAgent))) {
-                window.sr = new ScrollReveal({ reset: false });
-                sr.reveal('.sr-left', {
-                    origin: 'left'
-                    , scale: 1
-                    , opacity: .1
-                    , duration: 1200
-                });
-                sr.reveal('.sr-bottom', {
-                    scale: 1
-                    , opacity: .1
-                    , distance: '60px'
-                    , duration: 1000
-                });
-                sr.reveal('.sr-listshow', {
-                    distance: '30px'
-                    , duration: 1000
-                    , scale: 1
-                    , opacity: .1
-                });
-                sr.reveal('.sr-rightmodule', {
-                    origin: 'top'
-                    , distance: '60px'
-                    , duration: 1000
-                    , scale: 1
-                    , opacity: .1
-                });
-            };
-
-            //封面预览
-            layer.photos({
-                photos: '.article-left'
-                , anim: 5 //0-6的选择，指定弹出图片动画类型，默认随机（请注意，3.0之前的版本用shift参数）
-            });
-            layer.photos({
-                photos: '.article-detail-content'
-                , anim: 5
-                , move: false
-            });
-
-        });
-
         //监听评论提交
         form.on('submit(formRemark)', function (data) {
             if ($(data.elem).hasClass('layui-btn-disabled'))
                 return false;
-            var index = layer.load(1);
+            // var index = layer.load(1);
             $.ajax({
+                headers: {
+                    token: localStorage.getItem('login-token')
+                },
                 type: 'post',
-                url: '/api/article/remark',
-                data: data.field,
+                url: '/comment/saveComment',
+                data: {
+                    content: data.field.commentContent,
+                    blogId: detail.id,
+                },
                 success: function (res) {
-                    layer.close(index);
-                    if (res.code === 1) {
-                        layer.msg(res.msg, { icon: 6 });
-                        location.reload(true);
+                    // layer.close(index);
+                    if (res.status == 1) {
+                        layer.msg('提交评论成功');
+                        //重置编辑器
+                        $('#remarkEditor').val('');
+                        $('.blog-editor .layui-layedit').remove();
+                        editIndex = layedit.build('remarkEditor', {
+                            height: 150,
+                            tool: null,
+                        });
+                        getComment(1, 10, detail.id);
                     } else {
-                        if (res.msg != undefined) {
-                            layer.msg(res.msg, { icon: 5 });
-                        } else {
-                            layer.msg('程序异常，请重试或联系作者', { icon: 5 });
-                        }
+                        layer.alert(res.message);
                     }
                 },
                 error: function (e) {
-                    layer.close(index);
-                    if (e.status === 401) {
-                        layer.msg("请先登录", { shift: 6, icon: 5 });
+                    layer.alert("内部错误");
+                }
+            });
+            return false;
+        });
+
+        //监听留言/评论回复提交
+        form.on('submit(formReply)', function (data) {
+            if ($(data.elem).hasClass('layui-btn-disabled')) {
+                return false;
+            }
+            if (data.field.content == null || data.field.content.length == 0) {
+                layer.msg('回复不能为空');
+                return false;
+            }
+            // var index = layer.load(1);
+            $.ajax({
+                type: 'post',
+                url: '/comment/saveComment',
+                headers: {
+                    token: window.localStorage.getItem('login-token')
+                },
+                data: {
+                    content: data.field.content,
+                    blogId: window.blogId,
+                    replyTo: data.field.replyTo,
+                },
+                success: function (res) {
+                    if (res.status == 1) {
+                        layer.msg('提交评论成功');
+                        getComment(1, 10);
                     } else {
-                        layer.msg("请求异常", { shift: 6, icon: 2 });
+                        layer.alert(res.message);
                     }
+                },
+                error: function (e) {
+                    layer.alert('内部错误')
                 }
             });
             return false;
@@ -254,91 +101,48 @@ if (window.layui) {
 
         //监听留言提交
         form.on('submit(formComment)', function (data) {
-            var loading = layer.load(1);
+            // var loading = layer.load(1);
             $.ajax({
                 type: 'post',
-                url: '/api/comment/add',
-                data: data.field,
+                url: '/comment/saveComment',
+                headers: {
+                    token: window.localStorage.getItem('login-token')
+                },
+                data: {
+                    content: data.field.replyContent,
+                    replyTo: data.field.replyTo,
+                },
                 success: function (res) {
-                    layer.close(loading);
-                    if (res.code === 1) {
-                        layer.msg(res.msg, { icon: 6 });
-                        var comment = res.data
-                            , html = '<div class="layui-col-md12"><div class="comment-item sr-bottom animated slideInDown"><div class="comment-item-left"><div class="useravator" title="{UserName}"><img src="{UserAvatar}" alt="{UserName}"></div><div class="reply"><button class="layui-btn layui-btn-xs layui-btn-primary" blog-event="commentReply" data-id="{Id}" data-targetid="{UserId}" data-targetname="{UserName}">回复</button></div></div><div class="comment-item-right"><div class="content">{Content}</div><p class="createtime">— 来自<span style="padding:0 3px;padding-right:10px;color:#0094ff">{UserName}</span>{CreateTime}</p></div></div></div>'.replace(/{UserName}/g, comment.user.name).replace(/{UserId}/g, comment.user.id).replace(/{UserAvatar}/g, comment.user.avatar).replace(/{Id}/g, comment.id).replace(/{Content}/g, comment.content).replace(/{CreateTime}/g, util.timeAgo(comment.createTime, false));
-                        $('.commentlist').prepend(html);
-                        //重置编辑器
-                        $('#remarkEditor').val('');
-                        $('.blog-editor .layui-layedit').remove();
-                        editIndex = layedit.build('remarkEditor', {
-                            height: 150,
-                            tool: ['face', '|', 'left', 'center', 'right', '|', 'link'],
-                        });
-                        //绑定事件
-                        $('.commentlist').find('.comment-item:first').on('mouseover', function () {
-                            $(this).find('.reply').addClass('layui-show');
-                        }).on('mouseout', function () {
-                            $(this).find('.reply').removeClass('layui-show');
-                        });
-                        $('.commentlist').find('.comment-item:first').find('*[blog-event]').on('click', function () {
-                            var eventName = $(this).attr('blog-event');
-                            typeof blog.events[eventName] == 'function' && blog.events[eventName].call(this);
-                        });
-                        $('.commentlist').find('.comment-item:first').find('.reply').click(function (e) {
-                            layui.stope(e);
-                        });
+                    if (res.status == 1) {
+                        layer.msg('提交留言成功');
+                        getComment(1, 10);
                     } else {
-                        if (res.msg != undefined) {
-                            layer.msg(res.msg, { icon: 5 });
-                        } else {
-                            layer.msg('程序异常，请重试或联系作者', { icon: 5 });
-                        }
+                        layer.alert(res.message);
                     }
                 },
                 error: function (e) {
-                    layer.close(loading);
-                    if (e.status === 401) {
-                        layer.msg("请先登录", { shift: 6, icon: 5 });
-                    } else {
-                        layer.msg("请求异常", { shift: 6, icon: 2 });
-                    }
+                    layer.alert('内部错误')
                 }
             });
             return false;
         });
 
-        //监听搜索提交
-        form.on('submit(formSearch)', function (data) {
-            location.href = "/Article/Search?keywords=" + escape(data.field.keywords);
-            return false;
-        });
-
         //自定义验证规则
         form.verify({
-            content: function (value) {
+            commentContent: function (value) {
                 value = $.trim(layedit.getText(editIndex));
-                if (value == "") return "自少得有一个字吧";
+                if (value == "") {
+                    return '评论不能为空';
+                }
                 layedit.sync(editIndex);
             },
             replyContent: function (value) {
-                if (value == "") return "自少得有一个字吧";
+                value = $.trim(layedit.getText(editIndex));
+                if (value == "") {
+                    return '留言不能为空';
+                }
+                layedit.sync(editIndex);
             }
-        });
-
-        //用户评论tips
-        var tips;
-        $('.remark-user-avator').on('mouseover', function () {
-            tips = layer.tips('来自【' + $(this).data('name') + '】的评论', this, {
-                tips: 4,
-                time: 1000
-            });
-        });
-
-        $(".blog-user img").hover(function () {
-            var tips = layer.tips('点击退出', '.blog-user img', {
-                tips: [3, '#009688'],
-            });
-        }, function () {
-            layer.closeAll('tips');
         });
 
         $('.blog-navicon').click(function () {
@@ -353,44 +157,6 @@ if (window.layui) {
         $('.blog-mask').click(function () {
             leftOut();
         });
-
-        $('.blog-body,.blog-footer').click(function () {
-            categoryOut();
-        });
-
-        $('.category-toggle').click(function (e) {
-            e.stopPropagation();
-            categroyIn();
-        });
-
-        $('.article-category').click(function () {
-            categoryOut();
-        });
-
-        $('.article-category > a').click(function (e) {
-            e.stopPropagation();
-        });
-
-        function categroyIn() {
-            $('.category-toggle').addClass('layui-hide');
-            $('.article-category').unbind('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend');
-
-            $('.article-category').removeClass('categoryOut');
-            $('.article-category').addClass('categoryIn');
-            $('.article-category').addClass('layui-show');
-        }
-
-        function categoryOut() {
-            $('.article-category').on('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
-                $('.article-category').removeClass('layui-show');
-                $('.category-toggle').removeClass('layui-hide');
-            });
-
-            $('.article-category').removeClass('categoryIn');
-            $('.article-category').addClass('categoryOut');
-        }
-
-
 
         function leftIn() {
             $('.blog-mask').unbind('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend');
@@ -423,12 +189,8 @@ if (window.layui) {
             $('.blog-nav-left').addClass('leftOut');
             $('.blog-nav-left').removeClass('layui-show');
         }
-
-        layui.blog = blog;
     });
 }
-
-
 
 
 //时间格式化
@@ -455,4 +217,254 @@ Date.prototype.Format = function (formatStr) {
     str = str.replace(/s|S/g, this.getSeconds());
 
     return str;
+}
+
+function getComment(pageNum, pageSize) {
+    let data = {};
+    data.pageNum = pageNum;
+    data.pageSize = pageSize;
+    if (window.blogId != null)
+        data.blogId = window.blogId;
+    //博客详情页评论
+    $.ajax({
+        headers: {
+            'token': localStorage.getItem('login-token')
+        },
+        data: data,
+        type: "GET",                //请求方式
+        url: "/comment/getComment",                 //路径
+        async: true,             //是否异步
+        dataType: "json",        //返回数据的格式
+        success: function (res) {  //成功的回调函数
+            //具体内容
+            let html = "";
+            let list = res.data.commentList;
+            let user = res.data.user;
+            let isAdmin = false;
+            if (user != null && user.isAdmin == true)
+                isAdmin = true;
+            if (list == null || list.length == 0) {
+                document.getElementsByClassName('blog-comment')[0].innerHTML =
+                    "<div class=\"emptybox\">\n" +
+                    "    <p><i style=\"font-size:50px;color:#5fb878\" class=\"layui-icon\"></i></p>\n" +
+                    "    <p>暂无评论，大侠不妨来一发？</p>\n" +
+                    "</div>";
+            } else {
+                //管理员界面
+                for (let i in list) {
+                    let comment = list[i];
+                    html += "<li>\n" +
+                        "        <div class=\"comment-parent\">\n" +
+                        "            <a name=\"remark-@item.Id\"></a>\n" +
+                        "            <img src=\"" + comment.userAvatar + "\" alt=\"" + comment.userName + "\" />\n" +
+                        "            <div class=\"info\">\n";
+
+                    html += "           <span class=\"username\">" + comment.userName + "</span>\n";
+                    if (comment.replyTo != null) {
+                        //回复信息
+                        html += "       <span> 回复给 </span>\n";
+                        html += "       <span class=\"username\">" + comment.replyToUserName + "</span>\n";
+                    }
+                    if (isAdmin) {
+                        html += "       <a href=\"javascript:actionConfirm(" + comment.id + ", 'delComment')\" style='color: #009688; float: right'> 删除 </a>\n"
+                    }
+
+                    html += "        </div>\n" +
+                        "            <div class=\"content\">" + comment.content + "</div>\n" +
+                        "            <p class=\"info info-footer\"><span class=\"time\">" + comment.createTime + "</span><a href=\"javascript:openReply(" + i + ")\" class=\"btn-reply\">回复</a></p>\n" +
+                        "        </div>\n" +
+                        "        <!-- 回复编辑器 -->\n" +
+                        "        <div class=\"replycontainer layui-hide\">\n" +
+                        "            <form class=\"layui-form\" action=\"\">\n" +
+                        "                <div class=\"layui-form-item\">" +
+                        "                    <textarea name=\"content\" placeholder=\"请输入回复内容\" class=\"layui-textarea\" style=\"min-height:80px;\"></textarea>\n" +
+                        "                    <textarea name=\"replyTo\" class=\"layui-textarea layui-hide\" style=\"min-height:80px;\">" + comment.userId + "</textarea>\n" +
+                        "                </div>\n" +
+                        "                <div class=\"layui-form-item\">\n" +
+                        "                    <button class=\"layui-btn layui-btn-xs\" lay-submit=\"formReply\" lay-filter=\"formReply\">提交</button>\n" +
+                        "                </div>\n" +
+                        "            </form>\n" +
+                        "        </div>\n" +
+                        "    </li>";
+                }
+                document.getElementsByClassName('blog-comment')[0].innerHTML = html;
+            }
+        },
+        error: function () {
+            layer.alert("内部错误");
+        }
+    })
+}
+
+function openReply(index) {
+    let openButton = document.getElementsByClassName('btn-reply')[index];
+    let replyContainer = document.getElementsByClassName('replycontainer')[index]
+    if (openButton.text == '回复') {
+        replyContainer.classList.remove('layui-hide');
+        openButton.innerText = '收起';
+    } else {
+        replyContainer.classList.add('layui-hide');
+        openButton.innerText = '回复';
+    }
+}
+
+function actionConfirm(id, action) {
+    switch (action) {
+        case 'delComment':
+            layer.confirm('确认取消删除该评论？', {
+                btn: ['确认', '取消'] //可以无限个按钮
+            }, function(index){
+                delComment(id);
+            }, function(index){
+                layer.close(index);
+            });
+            break;
+        case 'deleteBlog':
+            layer.confirm('确认要删除该博客？', {
+                btn: ['删除', '取消'] //可以无限个按钮
+            }, function(index){
+                deleteBlog(id);
+            }, function(index){
+                layer.close(index);
+            });
+            break;
+        case 'setTop':
+            layer.confirm('确认置顶该博客？', {
+                btn: ['置顶', '取消'] //可以无限个按钮
+            }, function(index){
+                setTopBlog(id);
+            }, function(index){
+                layer.close(index);
+            });
+            break;
+        case 'cancelTop':
+            layer.confirm('确认取消置顶该博客？', {
+                btn: ['确认', '取消'] //可以无限个按钮
+            }, function(index){
+                cancelTop(id);
+            }, function(index){
+                layer.close(index);
+            });
+            break;
+    }
+}
+
+function delComment(id) {
+    $.ajax({
+        headers: {
+            'token': localStorage.getItem('login-token')
+        },
+        data: {
+            commentId: id,
+            blogId: window.blogId
+        },
+        type: "DELETE",                //请求方式
+        url: "/comment/delComment",                 //路径
+        async: false,             //是否异步
+        dataType: "json",        //返回数据的格式
+        success: function (res) {  //成功的回调函数
+            if (res.status == 1) {
+                layer.msg('删除成功');
+                getComment(1, 10);
+            } else {
+                layer.alert(res.message);
+            }
+        },
+        error: function () {
+            layer.alert("内部错误");
+        }
+    })
+}
+
+function deleteBlog(blogId) {
+    $.ajax({
+        headers: {
+            'token': localStorage.getItem('login-token')
+        },
+        type:"DELETE",                //请求方式
+        url:"/details/delete/" + blogId,                 //路径
+        async:true,             //是否异步
+        dataType:"json",        //返回数据的格式
+        success:function(res){  //成功的回调函数
+            if (res.status == 1) {
+                layer.open({
+                    content: '删除成功'
+                    ,btn: ['确认']
+                    ,yes: function(index, layero){
+                        window.location.href = '/index/tags';
+                    }
+                    ,cancel: function(){
+                        return false; //开启该代码可禁止点击该按钮关闭
+                    }
+                });
+            } else {
+                layer.alert(res.message);
+            }
+        },
+        error:function () {
+            layer.alert('内部错误');
+        }
+    })
+}
+
+function setTopBlog(id) {
+    $.ajax({
+        headers: {
+            'token': localStorage.getItem('login-token')
+        },
+        type:"POST",                //请求方式
+        url:"/index/setTop/" + id,                 //路径
+        async:true,             //是否异步
+        dataType:"json",        //返回数据的格式
+        success:function(res){  //成功的回调函数
+            if (res.status == 1) {
+                layer.open({
+                    content: '置顶成功'
+                    ,btn: ['确认']
+                    ,yes: function(index, layero){
+                        window.location.href = '/';
+                    }
+                    ,cancel: function(){
+                        return false; //开启该代码可禁止点击该按钮关闭
+                    }
+                });
+            } else {
+                layer.alert(res.message);
+            }
+        },
+        error:function () {
+            layer.alert('内部错误');
+        }
+    })
+}
+
+function cancelTop(id) {
+    $.ajax({
+        headers: {
+            'token': localStorage.getItem('login-token')
+        },
+        type:"POST",                //请求方式
+        url:"/index/cancelTop/" + id,                 //路径
+        async:true,             //是否异步
+        dataType:"json",        //返回数据的格式
+        success:function(res){  //成功的回调函数
+            if (res.status == 1) {
+                layer.open({
+                    content: '取消置顶成功'
+                    ,btn: ['确认']
+                    ,yes: function(index, layero){
+                        window.location.href = '/';
+                    }
+                    ,cancel: function(){
+                        return false; //开启该代码可禁止点击该按钮关闭
+                    }
+                });
+            } else {
+                layer.alert(res.message);
+            }
+        },
+        error:function () {
+            layer.alert('内部错误');
+        }
+    })
 }

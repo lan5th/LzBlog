@@ -2,7 +2,11 @@ package com.lan5th.blog.service.impl;
 
 import com.lan5th.blog.dao.BlogMapper;
 import com.lan5th.blog.pojo.BlogDetail;
+import com.lan5th.blog.pojo.Tag;
 import com.lan5th.blog.service.BlogDetailsService;
+import com.lan5th.blog.service.BlogsService;
+import com.lan5th.blog.service.FIleService;
+import com.lan5th.blog.service.TagsService;
 import com.lan5th.blog.utils.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,12 @@ public class BlogDetailsServiceImpl implements BlogDetailsService {
     private BlogMapper mapper;
     @Autowired
     private RedisUtil redisUtil;
+    @Autowired
+    private FIleService fIleService;
+    @Autowired
+    private BlogsService blogsService;
+    @Autowired
+    private TagsService tagsService;
 
     /**
      * 尝试查询缓存
@@ -32,91 +42,98 @@ public class BlogDetailsServiceImpl implements BlogDetailsService {
      * @return
      */
     @Override
-    public BlogDetail getBlogDetail(long id) {
+    public BlogDetail getBlogDetail(String id) {
         BlogDetail blogDetail = null;
-        Object o = redisUtil.get(CACHE_KEY + id);
+        long blogId = Long.parseLong(id);
+        Object o = redisUtil.get(CACHE_KEY + blogId);
         if (o  == null) {
-            blogDetail = mapper.getById(id);
+            blogDetail = mapper.getById(blogId);
             if (blogDetail != null) {
-                redisUtil.set(CACHE_KEY + id, blogDetail, EXPIRE_TIME);
+                redisUtil.set(CACHE_KEY + blogId, blogDetail, EXPIRE_TIME);
             }
         } else {
             blogDetail = (BlogDetail) o;
         }
         return blogDetail;
     }
-
-    /**
-     * 根据location获取文章内容
-     * @param id
-     * @return
-     */
+    
     @Override
-    public String getContent(long id) {
-        BlogDetail details = getBlogDetail(id);
-
-        if (details == null)
-            return "博客不存在";
-        else if (details.isDeleted())
-            return "博客已被删除，请联系管理员";
-
-        StringBuilder builder = new StringBuilder();
-        try {
-            File file = ResourceUtils.getFile("classpath:public/posts/" + details.getId());
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String tmpLine;
-            int i = 2;
-            while ((tmpLine = bufferedReader.readLine()) != null) {
-                if (i > 0) {
-                    if (tmpLine.equals("---"))
-                        i--;
-                } else {
-                    builder.append(tmpLine);
-                    builder.append("\n");
-                }
-            }
-
-            fileReader.close();
-            bufferedReader.close();
-        } catch (FileNotFoundException e) {
-            System.out.println("文件不存在，博客id:" + id);;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return builder.toString();
+    public String getContent(String id) {
+        return fIleService.getContent(id);
     }
-
+    
     /**
-     * 文件保存由Controller实现，Service层仅封装持久化逻辑
+     * 文件保存由FileController实现，Service层仅封装持久化逻辑
      * @param blogDetail
      */
     @Override
-    public String newBlog(BlogDetail blogDetail) {
+    public String create(BlogDetail blogDetail) {
+        if (blogDetail == null) {
+            return null;
+        }
+        
+        //数据库必需字段
+        blogDetail.setIdIfNew();
+        if (blogDetail.getBlogName() == null)
+            blogDetail.setBlogName("");
+        if (blogDetail.getTagId() == null)
+            blogDetail.setTagId(0L);
+        
         if (redisUtil.hasKey(CACHE_KEY + blogDetail.getId()) || mapper.getById(blogDetail.getId()) != null)
             return "博客已存在，请勿重复上传";
         mapper.save(blogDetail);
         redisUtil.delete(CACHE_KEY + blogDetail.getId());
+        blogsService.cleanListCache();
+        tagsService.cleanTagsCache();
         return "博客上传成功";
     }
-
+    
+    /**
+     * 同上，只有持久化逻辑
+     * @param blogDetail
+     * @return
+     */
     @Override
     public String updateBlog(BlogDetail blogDetail) {
-        if (mapper.getById(blogDetail.getId()) == null)
+        BlogDetail oldBlog = mapper.getById(blogDetail.getId(), true);
+        if (oldBlog == null)
             return "博客不存在，请重新上传";
+        //更新博客时如果旧博客路径存在则需要删除旧文件
+        if (blogDetail.getLocation() != null && oldBlog.getLocation() != null &&
+                !blogDetail.getLocation().equals(oldBlog.getLocation())) {
+            fIleService.delete(oldBlog.getLocation());
+        }
         mapper.update(blogDetail);
         redisUtil.delete(CACHE_KEY + blogDetail.getId());
         return "博客更新成功";
     }
 
     @Override
-    public String deleteBlog(long id) {
-        // TODO 文件删除部分
-        if (mapper.getById(id) == null)
+    public String deleteBlog(String id) {
+        long blogId = Long.parseLong(id);
+        if (mapper.getById(blogId) == null)
             return "博客不存在，请重新上传";
-        redisUtil.delete(CACHE_KEY + id);
-        // TODO ids和id转接适配
-        mapper.deleteByIds(new ArrayList<>());
-        return "博客删除成功";
+        //必须先删除文件，再删除数据
+        BlogDetail detail = getBlogDetail(id);
+        fIleService.delete(detail.getLocation());
+    
+        //删除博客数据
+        ArrayList<Long> idList = new ArrayList<>();
+        idList.add(Long.parseLong(id));
+        mapper.deleteByIds(idList);
+        
+        //需要判断对应tag是否已经为null
+        String tagId = String.valueOf(detail.getTagId());
+        Tag tag = tagsService.getTag(tagId);
+        //当tag下面没有博客时TagMapper会查不出数据，因此这里会是null
+        if (tag == null || tag.getBlogCount() == 0) {
+            tagsService.delTag(tagId);
+        }
+    
+        //清除相关缓存
+        redisUtil.delete(CACHE_KEY + blogId);
+        blogsService.cleanListCache();
+        tagsService.cleanTagsCache();
+        return null;
     }
 }

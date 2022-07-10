@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Collection;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -43,6 +44,18 @@ public class RedisUtil {
             } else {
                 redisTemplate.delete(CollectionUtils.arrayToList(key));
             }
+        }
+    }
+    
+    /**
+     * 根据前缀删除key
+     * @param prefix 要删除的前缀key
+     */
+    @SuppressWarnings("unchecked")
+    public void deleteByPrefix(String prefix) {
+        Set<String> keys = redisTemplate.keys(prefix + "*");
+        if (keys != null && keys.size() > 0) {
+            redisTemplate.delete(keys);
         }
     }
 

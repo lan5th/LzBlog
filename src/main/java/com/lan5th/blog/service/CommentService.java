@@ -1,5 +1,9 @@
 package com.lan5th.blog.service;
 
+import com.lan5th.blog.pojo.Comment;
+
+import java.util.List;
+
 /**
  * @author lan5th
  * @date 2022/6/23 22:37
@@ -13,11 +17,31 @@ public interface CommentService {
      * @param blogId
      * @return
      */
-    Integer getBlogCommentCount(Long blogId);
+    Integer getBlogCommentCount(String blogId);
     
     /**
      * 获取留言计数
      * @return
      */
     Integer getReplyCount();
+    
+    /**
+     * 获取一个博客的评论列表
+     */
+    List<Comment> getComment4Blog(Integer pageNum, Integer pageSize, String blogId);
+    
+    /**
+     * 获取留言板列表
+     */
+    List<Comment> getReplyList(Integer pageNum, Integer pageSize);
+    
+    void saveComment(String content, String blogId, String replyTo);
+    
+    void delComment(String commentId, String blogId);
+    
+    Comment getComment(String id);
+    
+    List<Comment> getCommentByPage(Integer pageNum, Integer pageSize, Long blogId);
+    
+    void cleanCommentCache(String blogId);
 }

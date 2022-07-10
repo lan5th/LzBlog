@@ -1,5 +1,6 @@
 package com.lan5th.blog.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lan5th.blog.utils.UIDUtil;
 import lombok.Data;
 
@@ -27,4 +28,8 @@ public class User {
     public boolean isDeleted() {
         return deleted;
     }
+    
+    //不加这个注解在序列化的时候会报错
+    @JsonIgnore
+    public boolean isAdmin() {return isAdmin;}
 }

@@ -8,7 +8,7 @@
     </update>
 
     <insert id="save" parameterType="com.lan5th.blog.pojo.Comment">
-        insert into lz_blog.comment(id, blog_id, content, user_id) VALUES (#{id}, #{blogId}, #{content}, #{userId});
+        insert into lz_blog.comment(id, blog_id, content, user_id, reply_to) VALUES (#{id}, #{blogId}, #{content}, #{userId}, #{replyTo});
     </insert>
 
     <update id="deleteByIds" parameterType="list">
@@ -19,20 +19,24 @@
     </update>
 
     <select id="getPagination" resultType="com.lan5th.blog.pojo.Comment">
-        select * from lz_blog.comment as c1
-        where c1.id in (select c3.id from (select c2.id from lz_blog.blogs as c2
+        select s1.*, u2.name replyToUserName from
+        (select c.id, c.blog_id, c.content, c.create_time, c.deleted, c.user_id, u1.name userName, u1.avatar_url userAvatar, c.reply_to
+        from lz_blog.comment c, lz_blog.user_info u1, lz_blog.user_info u2 where c.user_id = u1.id and c.id in
+        (select c3.id from (select c2.id from lz_blog.comment as c2
         <where>
             <choose>
                 <when test="blogId != null">
                     c2.blog_id = #{blogId}
                 </when>
                 <otherwise>
-                    blog_id != -1
+                    c2.blog_id != -1
                 </otherwise>
             </choose>
-            c2.deleted = 0
+            and c2.deleted = 0
         </where>
-        order by c2.create_time desc limit #{preNum}, #{postNum}) as c3) order by c1.create_time;
+        order by c2.create_time limit #{preNum}, #{postNum}) as c3)) s1
+        left join lz_blog.user_info u2 on s1.reply_to = u2.id
+        order by s1.create_time;
     </select>
 
     <select id="getCommentCount" resultType="integer">
@@ -48,5 +52,11 @@
             </choose>
             and deleted = 0;
         </where>
+    </select>
+
+    <select id="getSingleComment" resultType="com.lan5th.blog.pojo.Comment">
+        select s1.*, u2.name replyToUserName from (select c.id, c.blog_id, c.content, c.create_time, c.deleted, c.user_id, u1.name userName, u1.avatar_url userAvatar, c.reply_to
+        from lz_blog.comment c, lz_blog.user_info u1, lz_blog.user_info u2 where c.user_id = u1.id and c.id = #{id}) s1
+        left join lz_blog.user_info u2 on s1.reply_to = u2.id
     </select>
 </mapper>

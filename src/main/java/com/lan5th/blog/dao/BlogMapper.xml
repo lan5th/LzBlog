@@ -4,11 +4,35 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lan5th.blog.dao.BlogMapper">
     <select id="getById" parameterType="long" resultType="com.lan5th.blog.pojo.BlogDetail">
-        select * from lz_blog.blogs b, lz_blog.tags t where b.id = #{id} and b.tag_id = t.id and b.deleted = 0;
+        select * from lz_blog.blogs b, lz_blog.tags t
+        <where>
+            b.id = #{id} and b.tag_id = t.id
+            <if test="ignoreDelete == null || ignoreDelete = false">
+                and deleted = 0
+            </if>
+        </where>
     </select>
 
     <update id="update" parameterType="com.lan5th.blog.pojo.BlogDetail">
-        update lz_blog.blogs b, lz_blog.tags t set blog_name = #{blogName}, location = #{location}, tag_id = #{tagId}, short_content = #{shortContent} where b.id = #{id} and b.deleted = 0;
+        update lz_blog.blogs
+        <set>
+            <if test="blogName != null">
+                blog_name = #{blogName},
+            </if>
+            <if test="location != null">
+                location = #{location},
+            </if>
+            <if test="tagId != null">
+                tag_id = #{tagId},
+            </if>
+            <if test="shortContent != null">
+                short_content = #{shortContent},
+            </if>
+            <if test="deleted != null">
+                deleted = #{deleted},
+            </if>
+        </set>
+        where id = #{id};
     </update>
 
     <insert id="save" parameterType="com.lan5th.blog.pojo.BlogDetail">
@@ -34,9 +58,14 @@
         select b1.*, t.tag_name from lz_blog.blogs as b1, lz_blog.tags as t
         where b1.id in (select b3.id from (select b2.id from lz_blog.blogs as b2
         <where>
-            <if test="tagId != null">
-                and b2.tag_id = #{tagId}
-            </if>
+            <choose>
+                <when test="tagId != null">
+                    and b2.tag_id = #{tagId}
+                </when>
+                <otherwise>
+                    and b2.tag_id != 0
+                </otherwise>
+            </choose>
              and b2.deleted = 0
         </where>
         order by b2.create_time desc limit #{preNum}, #{postNum}) as b3)

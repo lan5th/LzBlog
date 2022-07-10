@@ -25,11 +25,15 @@ public interface BlogsService {
     List<BlogDetail> getTopBlogs();
     
     /**
-     * 设定置顶博客顺序
+     * 新建博客置顶
      * 传递null进来则为删除全部置顶博客
-     * @param topList
+     * @param blogId 新置顶的博客id
      */
-    void setTopBlog(List<Long> topList);
+    void newTopBlog(String blogId);
+    
+    void cancelTop(String blogId);
+    
+    void removeAllTops();
     
     Integer getTotalCount();
     
@@ -41,4 +45,6 @@ public interface BlogsService {
      * @return
      */
     List<BlogDetail> instantGetBlogsByPage(Integer pageNum, Integer pageSize, Long tagId);
+    
+    void cleanListCache();
 }

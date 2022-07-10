@@ -35,7 +35,7 @@
                     <div id="login-inform">暂时仅支持管理员账号登录</div>
                     <label class="layui-form-label">账号</label>
                     <div class="layui-input-inline">
-                        <input type="text" name="userId" required lay-verify="required" placeholder="请输入用户id"
+                        <input type="text" name="userId" required lay-verify="number" placeholder="请输入用户id"
                                autocomplete="off" class="layui-input">
                     </div>
                 </div>
@@ -48,7 +48,7 @@
                 </div>
                 <div class="layui-form-item">
                     <div class="layui-input-block">
-                        <button class="layui-btn" lay-submit lay-filter="formDemo">登录</button>
+                        <button class="layui-btn" lay-submit lay-filter="login">登录</button>
                     </div>
                 </div>
             </form>
@@ -76,7 +76,7 @@
         var form = layui.form;
 
         //提交
-        form.on('submit(formDemo)', function (data) {
+        form.on('submit(login)', function (data) {
             // layer.msg(JSON.stringify(data.field));
             //base64加密
             let convertPass = window.btoa(data.field.password);
@@ -91,12 +91,12 @@
                 async: false,             //是否异步
                 dataType: "json",        //返回数据的格式
                 success: function (res) {  //成功的回调函数
-                    const token = res.data.token;
+                    let token = res.data.token;
                     localStorage.setItem('login-token', token);
                     if (token != null) {
                         window.location.href = '/';
                     } else {
-                        alert('用户名或密码错误!');
+                        layer.alert('用户名或密码错误!');
                     }
                 },
                 error: function () {
