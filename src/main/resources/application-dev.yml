@@ -22,4 +22,8 @@ mybatis:
   configuration: #代替配置文件的功能
     map-underscore-to-camel-case: true
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+logging:
+  level:
+    root: info
+  config: classpath:config/log4j2-dev.xml
 

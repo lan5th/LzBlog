@@ -1,10 +1,11 @@
 package com.lan5th.blog.service.impl;
 
 import com.lan5th.blog.dao.BlogMapper;
-import com.lan5th.blog.dao.TagMapper;
 import com.lan5th.blog.pojo.BlogDetail;
 import com.lan5th.blog.service.BlogsService;
 import com.lan5th.blog.utils.RedisUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.util.List;
  */
 @Service
 public class BlogsServiceImpl implements BlogsService {
+    private static final Logger logger = LoggerFactory.getLogger(BlogsServiceImpl.class);
     //缓存标识
     private static final String CACHE_KEY = "index-";
     private static final String TOP_KEY = "top";
@@ -78,6 +80,7 @@ public class BlogsServiceImpl implements BlogsService {
         if (oldList == null)
             return;
         long id = Long.parseLong(blogId);
+        logger.info("取消置顶博客,id:" + blogId);
         ArrayList<BlogDetail> newList = new ArrayList<>();
         for (BlogDetail detail : oldList) {
             if (detail.getId().equals(id))
@@ -94,8 +97,10 @@ public class BlogsServiceImpl implements BlogsService {
     
     //置顶队列只保存在redis中，因此只能set的时候进行保存，get的时候无法保存redis
     private void setTopBlog(List<Long> idList) {
+        logger.info("设置置顶博客,ids:" + idList);
         if (idList == null || idList.size() == 0) {
             redisUtil.delete(TOP_KEY);
+            return;
         }
         //这里排序无法依据指定顺序进行排序，暂时搁置
         List<BlogDetail> tops = blogMapper.getByIds(idList);

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh" xmlns:th="http://www.thymeleaf.org/">
 
 <head>
     <meta charset="UTF-8">
@@ -46,6 +46,12 @@
                                autocomplete="off" class="layui-input">
                     </div>
                 </div>
+                <div>
+                    <label class="layui-form-label">访客请使用qq登录</label>
+                    <a href="/user/qqLogin">
+                        <img src="/res/images/bt_blue_76X24.png">
+                    </a>
+                </div>
                 <div class="layui-form-item">
                     <div class="layui-input-block">
                         <button class="layui-btn" lay-submit lay-filter="login">登录</button>
@@ -62,8 +68,19 @@
 <!-- 侧边导航遮罩 -->
 <div class="blog-mask animated layui-hide"></div>
 <script src="/res/lib/jquery.min.js"></script>
+<!--qq登录构建url-->
+<!--<script type="text/javascript"  charset="utf-8"-->
+<!--        src="http://connect.qq.com/qc_jssdk.js"-->
+<!--        data-appid="102017018"-->
+<!--        data-redirecturi="http://lan5th.xyz/user/qqAuth"-->
+<!--&gt;</script>-->
 <!-- 引用公共资源 -->
-<script type="text/javascript">
+<script type="text/javascript" th:inline="javascript">
+    let errMsg = [[${errMsg}]];
+    if (errMsg != null && errMsg.length > 0) {
+        alert(errMsg);
+    }
+
     $(document).ready(function () {
         $("#foot").load("/html/foot.html");
         $("#head").load("/html/head.html");
@@ -71,7 +88,6 @@
         $("#side").load("/html/side.html");
     });
 
-    //Demo
     layui.use('form', function () {
         var form = layui.form;
 
@@ -106,6 +122,10 @@
             return false;
         });
     });
+
+    // QC.Login({
+    //     btnId:"qqLoginBtn"	//插入按钮的节点id
+    // });
 </script>
 <script src="https://cdn.bootcss.com/scrollReveal.js/3.3.6/scrollreveal.js"></script>
 <script src="/res/js/site.js"></script>

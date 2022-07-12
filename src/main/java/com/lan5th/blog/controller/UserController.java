@@ -76,14 +76,18 @@ public class UserController {
      * @param request
      * @return
      */
-    @RequestMapping(value = "/qqAuth", method = RequestMethod.POST)
-    public JsonObject qqAuth(HttpServletRequest request) {
-        JsonObject res = new JsonObject();
+    @RequestMapping(value = "/qqAuth", method = RequestMethod.GET)
+    public ModelAndView qqAuth(HttpServletRequest request,String code) {
+        ModelAndView mav;
         String token = userService.qqAuth(request);
         if (token != null) {
-            res.put("token", token);
+            mav = new ModelAndView("html/index");
+            mav.addObject("token", token);
+        } else {
+            mav = new ModelAndView("html/login");
+            mav.addObject("errMsg", "内部错误，登录失败!");
         }
-        return res;
+        return mav;
     }
     
     @RequestMapping(value = "/logout", method = RequestMethod.GET)

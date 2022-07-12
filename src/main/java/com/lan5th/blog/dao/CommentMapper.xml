@@ -21,7 +21,7 @@
     <select id="getPagination" resultType="com.lan5th.blog.pojo.Comment">
         select s1.*, u2.name replyToUserName from
         (select c.id, c.blog_id, c.content, c.create_time, c.deleted, c.user_id, u1.name userName, u1.avatar_url userAvatar, c.reply_to
-        from lz_blog.comment c, lz_blog.user_info u1, lz_blog.user_info u2 where c.user_id = u1.id and c.id in
+        FROM lz_blog.comment c JOIN lz_blog.user_info u1 LEFT JOIN lz_blog.user_info u2 ON c.reply_to = u2.id WHERE c.user_id = u1.id AND c.id IN
         (select c3.id from (select c2.id from lz_blog.comment as c2
         <where>
             <choose>

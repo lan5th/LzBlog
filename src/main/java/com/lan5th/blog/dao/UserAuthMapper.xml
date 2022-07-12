@@ -21,4 +21,12 @@
             #{id}
         </foreach>
     </update>
+
+    <select id="auth" resultType="com.lan5th.blog.pojo.UserAuth">
+        select * from lz_blog.user_auth ua, lz_blog.user_info ui where ua.id = #{id} and ua.id = ui.id and ui.is_admin = true and ua.deleted = false;
+    </select>
+
+    <update id="saveAuth" parameterType="com.lan5th.blog.pojo.UserAuth">
+        insert into lz_blog.user_auth(id, password) values (#{id}, #{password});
+    </update>
 </mapper>

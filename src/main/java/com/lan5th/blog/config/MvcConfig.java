@@ -27,31 +27,6 @@ public class MvcConfig {
                 registry.addViewController("/").setViewName("html/index");
                 registry.addViewController("/index.html").setViewName("html/index");
             }
-
-//            /**
-//             * 注册拦截器
-//             * @param registry
-//             */
-//            @Override
-//            public void addInterceptors(InterceptorRegistry registry) {
-//                registry.addInterceptor(new LoginInterceptor()).addPathPatterns("/**");
-//            }
-    
-//            /**
-//             * 静态资源虚拟地址映射
-//             * 文件上传读取相关
-//             * @param registry
-//             */
-//            @Override
-//            public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//                //获取jar包物理路径
-//                ApplicationHome ah = new ApplicationHome(getClass());
-//                File jarFile = ah.getSource();
-//                String filePath = jarFile.getParentFile().getPath() + "/upload";
-//                System.out.println("初始化文件上传路径:" + filePath);
-//                registry.addResourceHandler("/app_file/**")
-//                        .addResourceLocations("file:" + filePath + "/") ;
-//            }
         };
     }
 }

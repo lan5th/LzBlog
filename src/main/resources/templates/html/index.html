@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh" xmlns:th="http://www.thymeleaf.org/">
 
 <head>
     <meta charset="UTF-8">
@@ -173,8 +173,12 @@
 <script src="/res/js/index.js"></script>
 <!--<script src="/res/js/common.js"></script>-->
 <!-- 引用公共资源 -->
-<script type="text/javascript">
+<script type="text/javascript" th:inline="javascript">
     $(document).ready(function() {
+        let token = [[${token}]];
+        if (token != null && token != '') {
+            window.localStorage.setItem('login-token', token);
+        }
         topBlog();
         $("#foot").load("/html/foot.html");
         $("#head").load("/html/head.html", function () {

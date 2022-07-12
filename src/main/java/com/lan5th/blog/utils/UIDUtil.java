@@ -9,9 +9,9 @@ import java.util.Date;
  * 生成long型UID
  */
 public class UIDUtil {
-    private static long tmpID = 0L;
+    private static Long tmpID = 0L;
 
-    public static long getNewId()
+    public static Long getNewId()
     {
         long newId = Long.valueOf(new SimpleDateFormat("yyMMddhhmmssSSS").format(new Date())) * 10000;
         synchronized (UIDUtil.class) {

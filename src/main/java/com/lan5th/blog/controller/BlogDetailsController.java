@@ -2,7 +2,6 @@ package com.lan5th.blog.controller;
 
 import com.lan5th.blog.anotation.RequireToken;
 import com.lan5th.blog.pojo.BlogDetail;
-import com.lan5th.blog.pojo.Comment;
 import com.lan5th.blog.pojo.Tag;
 import com.lan5th.blog.service.BlogDetailsService;
 import com.lan5th.blog.service.CommentService;
@@ -10,6 +9,7 @@ import com.lan5th.blog.service.TagsService;
 import com.lan5th.blog.utils.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -61,6 +60,7 @@ public class BlogDetailsController {
      * @param params
      * @return
      */
+    @Transactional
     @RequireToken
     @RequestMapping(value = "/save", method = RequestMethod.POST)
     @ResponseBody
@@ -110,6 +110,7 @@ public class BlogDetailsController {
         return mav;
     }
     
+    @Transactional
     @RequireToken
     @ResponseBody
     @RequestMapping(value = "/delete/{id}", method = RequestMethod.DELETE)

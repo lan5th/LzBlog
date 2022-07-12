@@ -2,23 +2,25 @@ package com.lan5th.blog.service.impl;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.lan5th.blog.dao.UserAuthMapper;
 import com.lan5th.blog.dao.UserMapper;
 import com.lan5th.blog.pojo.User;
 import com.lan5th.blog.pojo.UserAuth;
 import com.lan5th.blog.service.UserService;
 import com.lan5th.blog.utils.RedisUtil;
+import com.lan5th.blog.utils.UIDUtil;
 import com.qq.connect.QQConnectException;
 import com.qq.connect.api.OpenID;
 import com.qq.connect.api.qzone.UserInfo;
 import com.qq.connect.javabeans.AccessToken;
 import com.qq.connect.javabeans.qzone.UserInfoBean;
 import com.qq.connect.oauth.Oauth;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -27,6 +29,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Service
 public class UserServiceImpl implements UserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     private static final String LOGIN_KEY = "token-";
     private static final String USER_INFO_KEY = "userInfo-";
     
@@ -35,14 +38,17 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserMapper userMapper;
     @Autowired
+    private UserAuthMapper userAuthMapper;
+    @Autowired
     private RedisUtil redisUtil;
     
     @Override
     public String auth(String userId, String password) {
         if (userId != null && password != null) {
             if (!userId.isEmpty() && !password.isEmpty()) {
-                UserAuth byId = userMapper.auth(Long.parseLong(userId));
+                UserAuth byId = userAuthMapper.auth(Long.parseLong(userId));
                 if (byId != null && byId.getPassword().equals(password)) {
+                    logger.info(byId.getId() + " 进行了管理员登录");
                     String sign = JWT.create().withAudience(String.valueOf(byId.getId())).sign(Algorithm.HMAC256(byId.getPassword()));
                     //30min过期
                     redisUtil.set(LOGIN_KEY + byId.getId().toString(), byId, 1, TimeUnit.HOURS);
@@ -87,56 +93,51 @@ public class UserServiceImpl implements UserService {
     @Override
     public String qqAuth(HttpServletRequest request) {
         try {
+            //在这里之前必须先执行new Oauth().getAuthorizeURL(request)方法,否则里面获取不到request中的qq_connect_state
             AccessToken accessTokenObj = (new Oauth()).getAccessTokenByRequest(request);
-        
-            if (accessTokenObj.getAccessToken().equals("")) {
-//                我们的网站被CSRF攻击了或者用户取消了授权
-//                做一些数据统计工作
-                System.out.print("没有获取到响应参数");
+            //这里sdk会自己再用code发一次请求来获取accessToken
+            String accessToken = accessTokenObj.getAccessToken();
+            if ("".equals(accessToken)) {
+                logger.error("没有获取到响应参数");
             } else {
-                String accessToken = accessTokenObj.getAccessToken();
-//                long tokenExpireIn = accessTokenObj.getExpireIn();
-//
-//                request.getSession().setAttribute("demo_access_token", accessToken);
-//                request.getSession().setAttribute("demo_token_expirein", String.valueOf(tokenExpireIn));
-            
-                // 利用获取到的accessToken 去获取当前用的openid -------- start
                 OpenID openIDObj =  new OpenID(accessToken);
                 String openID = openIDObj.getUserOpenID();
             
-//                request.getSession().setAttribute("demo_openid", openID);
-                // 利用获取到的accessToken 去获取当前用户的openid --------- end
-            
-            
-                //    out.println("<p> start -----------------------------------利用获取到的accessToken,openid 去获取用户在Qzone的昵称等信息 ---------------------------- start </p>");
                 UserInfo qzoneUserInfo = new UserInfo(accessToken, openID);
                 UserInfoBean userInfoBean = qzoneUserInfo.getUserInfo();
                 
                 
-                if (userInfoBean.getRet() == 0) {
-                    User user = userMapper.getById(Long.parseLong(openID));
+                if (userInfoBean.getRet() == 0) { //状态码为0表示成功
+                    User user = userMapper.getByOpenId(openID);
+                    UserAuth auth = null;
                     if (user == null) {
                         user = new User();
-                        user.setId(Long.parseLong(openID));
+                        user.setId(UIDUtil.getNewId());
+                        user.setName(userInfoBean.getNickname());
+                        user.setOpenId(openID);
                         user.setAvatarUrl(userInfoBean.getAvatar().getAvatarURL30());
                         user.setIsAdmin(false);
                         //userInfo
                         userMapper.save(user);
-                        UserAuth auth = new UserAuth();
-                        auth.setId(Long.parseLong(openID));
+                        auth = new UserAuth();
+                        auth.setId(user.getId());
                         auth.setPassword(QQ_LOGIN_PASS);
                         //userAuth
-                        userMapper.saveAuth(auth);
+                        userAuthMapper.saveAuth(auth);
+                    } else {
+                        auth = userAuthMapper.getById(user.getId());
                     }
+                    logger.info(user.getId() + " 进行了qq登录");
                     //获取本地token
-                    String sign = JWT.create().withAudience(String.valueOf(user.getId()), "").sign(Algorithm.HMAC256(QQ_LOGIN_PASS));
+                    String sign = JWT.create().withAudience(String.valueOf(user.getId())).sign(Algorithm.HMAC256(QQ_LOGIN_PASS));
+                    redisUtil.set(LOGIN_KEY + user.getId(), auth, 1, TimeUnit.HOURS);
                     return sign;
                 } else {
-                    System.out.println("很抱歉，我们没能正确获取到您的信息，原因是： " + userInfoBean.getMsg());
+                    logger.warn("未能正确获取到用户信息，原因是： " + userInfoBean.getMsg());
                 }
             }
         } catch (QQConnectException e) {
-            System.out.println("未知错误QQConnectException");
+            logger.error("未知错误QQConnectException", e);
         }
         return null;
     }

@@ -86,7 +86,7 @@ if (window.layui) {
                 },
                 success: function (res) {
                     if (res.status == 1) {
-                        layer.msg('提交评论成功');
+                        layer.msg('提交回复成功');
                         getComment(1, 10);
                     } else {
                         layer.alert(res.message);

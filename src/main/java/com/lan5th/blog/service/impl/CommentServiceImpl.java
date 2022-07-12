@@ -2,9 +2,12 @@ package com.lan5th.blog.service.impl;
 
 import com.lan5th.blog.dao.CommentMapper;
 import com.lan5th.blog.pojo.Comment;
+import com.lan5th.blog.pojo.User;
 import com.lan5th.blog.service.CommentService;
 import com.lan5th.blog.utils.RedisUtil;
 import com.lan5th.blog.utils.UserUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +20,7 @@ import java.util.List;
  */
 @Service
 public class CommentServiceImpl implements CommentService {
+    private static final Logger logger = LoggerFactory.getLogger(CommentServiceImpl.class);
     //缓存标识
     private static final String COMMENT_COUNT_KEY = "commentCount";
     private static final String REPLY_COUNT_KEY = "replyCount";
@@ -102,7 +106,9 @@ public class CommentServiceImpl implements CommentService {
         } else {
             comment.setBlogId(-1L);
         }
-        comment.setUserId(UserUtil.getCurrentUser().getId());
+        User currentUser = UserUtil.getCurrentUser();
+        comment.setUserId(currentUser.getId());
+        logger.info(currentUser.getId() + " 发表了评论 " + content + ",回复给" + replyTo);
         if (replyTo != null) {
             comment.setReplyTo(Long.parseLong(replyTo));
         }
@@ -118,6 +124,7 @@ public class CommentServiceImpl implements CommentService {
     
         ArrayList<Long> idList = new ArrayList<>();
         idList.add(Long.parseLong(commentId));
+        logger.info(UserUtil.getCurrentUser().getId() + " 删除了评论,commentId" + commentId);
         commentMapper.deleteByIds(idList);
         cleanCommentCache(blogId);
     }

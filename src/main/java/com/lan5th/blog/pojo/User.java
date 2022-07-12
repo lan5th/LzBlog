@@ -14,7 +14,7 @@ import java.sql.Date;
 public class User {
     private Long id;
     private String name;
-    private Long qqId;
+    private String openId;
     private String avatarUrl;
     private Boolean deleted;
     private Boolean isAdmin;

@@ -7,6 +7,7 @@ import com.lan5th.blog.service.FIleService;
 import com.lan5th.blog.utils.JsonObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,6 +40,7 @@ public class FIleController {
      * @return
      * @throws IOException
      */
+    @Transactional
     @RequireToken
     @RequestMapping(value = "/upload", method = RequestMethod.POST)
     @ResponseBody

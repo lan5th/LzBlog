@@ -8,11 +8,11 @@ import com.lan5th.blog.service.BlogsService;
 import com.lan5th.blog.service.FIleService;
 import com.lan5th.blog.service.TagsService;
 import com.lan5th.blog.utils.RedisUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
-import java.io.*;
 import java.util.ArrayList;
 
 /**
@@ -21,6 +21,7 @@ import java.util.ArrayList;
  */
 @Service
 public class BlogDetailsServiceImpl implements BlogDetailsService {
+    private static final Logger logger = LoggerFactory.getLogger(BlogDetailsServiceImpl.class);
     //前缀标识
     private static final String CACHE_KEY = "detail-";
     //过期时间
@@ -79,8 +80,10 @@ public class BlogDetailsServiceImpl implements BlogDetailsService {
         if (blogDetail.getTagId() == null)
             blogDetail.setTagId(0L);
         
-        if (redisUtil.hasKey(CACHE_KEY + blogDetail.getId()) || mapper.getById(blogDetail.getId()) != null)
+        if (redisUtil.hasKey(CACHE_KEY + blogDetail.getId()) || mapper.getById(blogDetail.getId()) != null) {
+            logger.warn("create-博客已存在,id:" +blogDetail.getId());
             return "博客已存在，请勿重复上传";
+        }
         mapper.save(blogDetail);
         redisUtil.delete(CACHE_KEY + blogDetail.getId());
         blogsService.cleanListCache();
@@ -101,6 +104,7 @@ public class BlogDetailsServiceImpl implements BlogDetailsService {
         //更新博客时如果旧博客路径存在则需要删除旧文件
         if (blogDetail.getLocation() != null && oldBlog.getLocation() != null &&
                 !blogDetail.getLocation().equals(oldBlog.getLocation())) {
+            logger.info("updateBlog-旧博客文件存在，需要删除旧博客文件:" + oldBlog.getLocation());
             fIleService.delete(oldBlog.getLocation());
         }
         mapper.update(blogDetail);
@@ -111,8 +115,10 @@ public class BlogDetailsServiceImpl implements BlogDetailsService {
     @Override
     public String deleteBlog(String id) {
         long blogId = Long.parseLong(id);
-        if (mapper.getById(blogId) == null)
+        if (mapper.getById(blogId) == null) {
+            logger.warn("deleteBlog-博客不存在,id:" + id);
             return "博客不存在，请重新上传";
+        }
         //必须先删除文件，再删除数据
         BlogDetail detail = getBlogDetail(id);
         fIleService.delete(detail.getLocation());
@@ -127,6 +133,7 @@ public class BlogDetailsServiceImpl implements BlogDetailsService {
         Tag tag = tagsService.getTag(tagId);
         //当tag下面没有博客时TagMapper会查不出数据，因此这里会是null
         if (tag == null || tag.getBlogCount() == 0) {
+            logger.info("该tag下所有博客已被清空，即将删除tag数据,tagId" + tagId);
             tagsService.delTag(tagId);
         }
     

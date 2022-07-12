@@ -1,8 +1,7 @@
 function topBlog() {
-    let token = localStorage.getItem("login-token");
     $.ajax({
         headers: {
-            'token': token
+            'token': localStorage.getItem("login-token")
         },
         type:"GET",                //请求方式
         url:"/index/topBlog",                 //路径

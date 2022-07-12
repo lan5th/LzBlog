@@ -5,10 +5,11 @@ import com.lan5th.blog.service.BlogDetailsService;
 import com.lan5th.blog.service.FIleService;
 import com.lan5th.blog.utils.RedisUtil;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.system.ApplicationHome;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,16 +19,15 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.Date;
 
 /**
  * @author lan5th
  * @date 2022/6/29 16:38
  */
-@Service()
+@Service
 public class FileServiceImpl implements FIleService, InitializingBean {
+    private static final Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
     private static String FILE_PATH;
     
     @Override
@@ -40,12 +40,9 @@ public class FileServiceImpl implements FIleService, InitializingBean {
             jarFile = ah.getSource();
             filePath = jarFile.getParentFile().getPath() + "/upload/";
             FILE_PATH = filePath;
-            System.out.println("初始化文件上传路径:" + filePath);
+            logger.info("初始化文件上传路径:" + filePath);
         } catch (NullPointerException e) {
             // TODO 运行单元测试时ApplicationHome(getClass())会报空指针异常
-            System.out.println("getClass(): " + getClass());
-            System.out.println("ah.getSource(): " + jarFile);
-            System.out.println("jarFile.getParentFile().getPath() + \"/upload/\": " + filePath);
         }
     }
     
@@ -71,7 +68,7 @@ public class FileServiceImpl implements FIleService, InitializingBean {
         String blogPath = realPath + "/" + blogId;
         //保存文件
         FileUtils.copyInputStreamToFile(file.getInputStream(), new File(blogPath));
-        System.out.println("上传文件路径：" + blogPath);
+        logger.info("blogId:" + blogId + ",上传文件路径：" + blogPath);
         return "public/posts" + datePath + "/" + blogId;
     }
     
@@ -81,7 +78,7 @@ public class FileServiceImpl implements FIleService, InitializingBean {
             return;
         File toBeDelete = new File(FILE_PATH + location);
         if (!toBeDelete.exists()) {
-            System.out.println("文件不存在,文件路径:" + location);
+            logger.error("文件不存在,文件路径:" + location);
         } else {
             toBeDelete.delete();
         }
@@ -102,7 +99,7 @@ public class FileServiceImpl implements FIleService, InitializingBean {
             try {
                 contentFile = ResourceUtils.getFile(location);
             } catch (FileNotFoundException e) {
-                System.out.println("文件不存在，博客id:" + id);;
+                logger.error("文件不存在，博客id:" + id);;
             }
             
             //流操作使用try-with-resource方式，更安全

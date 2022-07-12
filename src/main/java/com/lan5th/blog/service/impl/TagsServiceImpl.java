@@ -6,6 +6,8 @@ import com.lan5th.blog.pojo.Tag;
 import com.lan5th.blog.service.BlogsService;
 import com.lan5th.blog.service.TagsService;
 import com.lan5th.blog.utils.RedisUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +20,7 @@ import java.util.List;
  */
 @Service
 public class TagsServiceImpl implements TagsService {
+    private static final Logger logger = LoggerFactory.getLogger(TagsServiceImpl.class);
     private static final String TAGS_KEY = "tags";
     private static final int EXPIRE_TIME = 10;
     @Autowired

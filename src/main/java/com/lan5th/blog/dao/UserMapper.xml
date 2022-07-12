@@ -8,11 +8,11 @@
     </select>
 
     <update id="update" parameterType="com.lan5th.blog.pojo.User">
-        update lz_blog.user_info set name = #{name}, qq_id = #{qqId}, avatar_url = #{avatarUrl}, is_admin = #{isAdmin} where id = #{id} and deleted = 0;
+        update lz_blog.user_info set name = #{name}, openid = #{openId}, avatar_url = #{avatarUrl}, is_admin = #{isAdmin} where id = #{id} and deleted = 0;
     </update>
 
     <insert id="save" parameterType="com.lan5th.blog.pojo.User">
-        insert into lz_blog.user_info(id, name, qq_id, avatar_url, is_admin) VALUES (#{id}, #{name}, #{qqId}, #{avatarUrl}, #{isAdmin});
+        insert into lz_blog.user_info(id, name, openid, avatar_url, is_admin) VALUES (#{id}, #{name}, #{openId}, #{avatarUrl}, #{isAdmin});
     </insert>
 
     <update id="deleteByIds" parameterType="list">
@@ -31,11 +31,7 @@
         and deleted = 0;
     </select>
 
-    <select id="auth" resultType="com.lan5th.blog.pojo.UserAuth">
-        select * from lz_blog.user_auth where id = #{id} and deleted = false;
+    <select id="getByOpenId" resultType="com.lan5th.blog.pojo.User">
+        select * from lz_blog.user_info where openid = #{openId} and deleted = 0;
     </select>
-
-    <update id="saveAuth" parameterType="com.lan5th.blog.pojo.UserAuth">
-        insert into lz_blog.user_auth(id, password) values (#{id}, #{password});
-    </update>
 </mapper>

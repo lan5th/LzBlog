@@ -20,4 +20,13 @@ public interface UserAuthMapper {
     void save(UserAuth userAuth);
     
     void deleteByIds(List<Long> ids);
+    
+    /**
+     * 从user_auth表中获取认证信息
+     * @param Id
+     * @return
+     */
+    UserAuth auth(long Id);
+    
+    void saveAuth(UserAuth auth);
 }
