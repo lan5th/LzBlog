@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lan5th.blog.utils.UIDUtil;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.sql.Date;
 
 /**
@@ -11,7 +12,9 @@ import java.sql.Date;
  * @date 2022/6/23 21:40
  */
 @Data
-public class User {
+public class User implements Serializable {
+    private static final Long serializeVersion = 1L;
+    
     private Long id;
     private String name;
     private String openId;

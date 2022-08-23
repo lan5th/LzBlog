@@ -19,24 +19,26 @@
     </update>
 
     <select id="getPagination" resultType="com.lan5th.blog.pojo.Comment">
-        select s1.*, u2.name replyToUserName from
-        (select c.id, c.blog_id, c.content, c.create_time, c.deleted, c.user_id, u1.name userName, u1.avatar_url userAvatar, c.reply_to
-        FROM lz_blog.comment c JOIN lz_blog.user_info u1 LEFT JOIN lz_blog.user_info u2 ON c.reply_to = u2.id WHERE c.user_id = u1.id AND c.id IN
-        (select c3.id from (select c2.id from lz_blog.comment as c2
+        select c.id, c.blog_id, c.content, c.create_time, c.deleted, c.user_id, u1.name userName, u1.avatar_url userAvatar, c.reply_to, u2.name replyToUserName
+        from lz_blog.comment c join lz_blog.user_info u1 left join lz_blog.user_info u2
+        on c.reply_to = u2.id
         <where>
+            c.user_id = u1.id
             <choose>
                 <when test="blogId != null">
-                    c2.blog_id = #{blogId}
+                    and c.blog_id = #{blogId}
                 </when>
                 <otherwise>
-                    c2.blog_id != -1
+                    and c.blog_id != -1
                 </otherwise>
             </choose>
-            and c2.deleted = 0
+            and c.deleted = 0
         </where>
-        order by c2.create_time limit #{preNum}, #{postNum}) as c3)) s1
-        left join lz_blog.user_info u2 on s1.reply_to = u2.id
-        order by s1.create_time;
+        order by c.create_time
+        <if test="blogId == -1">
+            desc
+        </if>
+        limit #{preNum}, #{postNum}
     </select>
 
     <select id="getCommentCount" resultType="integer">

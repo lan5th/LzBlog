@@ -37,19 +37,26 @@ public class LoginAspect {
         Object result;
         if (signature.getDeclaringType() != HtmlController.class && signature instanceof MethodSignature) {
             //验证token
-            UserUtil.verifyToken();
+            boolean verifyResult = UserUtil.verifyToken();
             User user = UserUtil.getCurrentUser();
     
             MethodSignature methodSignature = (MethodSignature) signature;
             RequireToken requireToken = methodSignature.getMethod().getAnnotation(RequireToken.class);
             if (requireToken != null) {
-                if (user == null) {
-                    JsonObject res = new JsonObject();
-                    res.setStatus(false);
-                    res.setMessage("您未登录，无法进行相关操作");
-                    return res;
-                }
-                if (requireToken.requireAdmin()) {
+                if (!verifyResult) {
+                    if (user == null) {
+                        JsonObject res = new JsonObject();
+                        res.setStatus(false);
+                        res.setMessage("您未登录或登录已失效，无法进行相关操作");
+                        return res;
+                    } else {
+                        //这里其实只要不乱用token一般不会执行
+                        JsonObject res = new JsonObject();
+                        res.setStatus(false);
+                        res.setMessage("您的登录已经失效，请重新登录");
+                        return res;
+                    }
+                } else if (requireToken.requireAdmin()) {
                     if (!user.isAdmin()) {
                         JsonObject res = new JsonObject();
                         res.setStatus(false);

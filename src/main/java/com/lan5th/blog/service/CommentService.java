@@ -17,13 +17,13 @@ public interface CommentService {
      * @param blogId
      * @return
      */
-    Integer getBlogCommentCount(String blogId);
+    int getBlogCommentCount(String blogId);
     
     /**
      * 获取留言计数
      * @return
      */
-    Integer getReplyCount();
+    int getReplyCount();
     
     /**
      * 获取一个博客的评论列表

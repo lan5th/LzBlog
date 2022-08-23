@@ -1,10 +1,4 @@
-﻿﻿/* 全局js
- * @Author: Leo 
- * @Date: 2019-10-09 11:36:17 
- * @Last Modified by:   Leo 
- * @Last Modified time: 2019-10-09 11:36:17 
- */
-if (window.layui) {
+﻿if (window.layui) {
     layui.use(['element', 'layer', 'form', 'util', 'flow', 'layedit'], function () {
         var element = layui.element
             , form = layui.form
@@ -52,6 +46,7 @@ if (window.layui) {
                             tool: null,
                         });
                         getComment(1, 10, detail.id);
+                        document.getElementById("commentTotal").innerText++;
                     } else {
                         layer.alert(res.message);
                     }
@@ -88,6 +83,7 @@ if (window.layui) {
                     if (res.status == 1) {
                         layer.msg('提交回复成功');
                         getComment(1, 10);
+                        document.getElementById("commentTotal").innerText++;
                     } else {
                         layer.alert(res.message);
                     }
@@ -346,6 +342,15 @@ function actionConfirm(id, action) {
                 layer.close(index);
             });
             break;
+        case 'delLink':
+            layer.confirm('确认删除该链接？',{
+                btn: ['删除', '取消'] //可以无限个按钮
+            }, function(index){
+                delLink(id);
+            }, function(index){
+                layer.close(index);
+            });
+            break;
     }
 }
 
@@ -462,6 +467,208 @@ function cancelTop(id) {
             } else {
                 layer.alert(res.message);
             }
+        },
+        error:function () {
+            layer.alert('内部错误');
+        }
+    })
+}
+
+function getLinks() {
+    //博主推荐
+    $.ajax({
+        headers: {
+            'token': localStorage.getItem("login-token")
+        },
+        type:"GET",                //请求方式
+        url:"/index/getLinks",                 //路径
+        data: {
+            type: 1
+        },
+        async:true,             //是否异步
+        dataType:"json",        //返回数据的格式
+        success:function(res) {
+            let html = "";
+            let links = res.data.links;
+            let user = JSON.parse(localStorage.getItem('user'));
+            if (user != null && user.isAdmin == true) {
+                let tmpNo = 1;
+                for (let i in links) {
+                    let link = links[i];
+                    html += "<li>\n" +
+                        "        <span class=\"layui-badge \">" + tmpNo + "</span>" +
+                        "        <a href=\"" + link.url + "\" title=\"" + link.linkName + "\">" + link.linkName + "</a>\n" +
+                        "        <a href=\"javascript:actionConfirm(" + link.id + ", 'delLink')\" style=\"float: right\">删除链接</a>" +
+                        "    </li>";
+                    tmpNo++;
+                }
+                let btns = document.getElementsByClassName('link-btn');
+                btns[0].removeAttribute('hidden');
+                btns[1].removeAttribute('hidden');
+            } else {
+                for (let i in links) {
+                    let link = links[i];
+                    html += "<li>\n" +
+                        "        <span class=\"layui-badge \">1</span><a href=\"" + link.url + "\"\n" +
+                        "             title=\"" + link.linkName + "\">" + link.linkName + "</a>\n" +
+                        "    </li>";
+                }
+            }
+            document.getElementById("link-space-recommend").innerHTML = html;
+        },
+        error:function () {
+            alert('内部错误');
+        }
+    })
+    //友链
+    $.ajax({
+        headers: {
+            'token': localStorage.getItem("login-token")
+        },
+        type:"GET",                //请求方式
+        url:"/index/getLinks",                 //路径
+        data: {
+            type: 2
+        },
+        async:true,             //是否异步
+        dataType:"json",        //返回数据的格式
+        success:function(res) {
+            let html = "";
+            let links = res.data.links;
+            let user = JSON.parse(localStorage.getItem('user'));
+            if (user != null && user.isAdmin == true) {
+                for (let i in links) {
+                    let link = links[i];
+                    html += "<li><a target=\"_blank\" href=\"" + link.url + "\" " +
+                        "title=\"" + link.linkName + "\">" + link.linkName + "</a></li>";
+                }
+            } else {
+                for (let i in links) {
+                    let link = links[i];
+                    html += "<li><a target=\"_blank\" href=\"" + link.url + "\" " +
+                        "title=\"" + link.linkName + "\">" + link.linkName + "</a></li>";
+                }
+            }
+            document.getElementById("link-space-friend").innerHTML = html;
+        },
+        error:function () {
+            layer.alert('内部错误');
+        }
+    })
+}
+
+function addLink(type) {
+    layer.prompt({title: '请输入链接名', formType: 3}, function(linkName, index){
+        layer.close(index);
+        layer.prompt({title: '请输入链接url', formType: 3}, function(url, index) {
+            layer.close(index);
+            $.ajax({
+                headers: {
+                    'token': localStorage.getItem('login-token')
+                },
+                data: {
+                    linkName: linkName,
+                    url: url,
+                    type: type
+                },
+                type: "POST",                //请求方式
+                url: "/index/saveLink",                 //路径
+                async: true,             //是否异步
+                dataType: "json",        //返回数据的格式
+                success: function (res) {  //成功的回调函数
+                    //渲染所有tag
+                    if (res.status == 1) {
+                        layer.open({
+                            content: '新增链接成功'
+                            , btn: ['确认']
+                            , yes: function (index, layero) {
+                                window.location.href = '/';
+                            }
+                            , cancel: function () {
+                                return false; //开启该代码可禁止点击该按钮关闭
+                            }
+                        });
+                    } else {
+                        layer.alert(res.message);
+                    }
+                },
+                error: function () {
+                    layer.alert('内部错误');
+                }
+            })
+        });
+    });
+}
+
+function delLink(id) {
+    $.ajax({
+        headers: {
+            'token': localStorage.getItem("login-token")
+        },
+        type:"delete",                //请求方式
+        url:"/index/delLink",                 //路径
+        data: {
+            id: id
+        },
+        async:true,             //是否异步
+        dataType:"json",        //返回数据的格式
+        success:function(res) {
+            layer.open({
+                content: '删除成功'
+                ,btn: ['确认']
+                ,yes: function(index, layero){
+                    location.reload();
+                }
+                ,cancel: function(){
+                    return false; //开启该代码可禁止点击该按钮关闭
+                }
+            });
+        },
+        error:function () {
+            layer.alert('内部错误');
+        }
+    })
+}
+
+function getFriendLinks4About() {
+    $.ajax({
+        headers: {
+            'token': localStorage.getItem("login-token")
+        },
+        type:"GET",                //请求方式
+        url:"/index/getLinks",                 //路径
+        data: {
+            type: 2
+        },
+        async:true,             //是否异步
+        dataType:"json",        //返回数据的格式
+        success:function(res) {
+            let html = "";
+            let links = res.data.links;
+            let user = JSON.parse(localStorage.getItem('user'));
+            if (user != null && user.isAdmin == true) {
+                for (let i in links) {
+                    let link = links[i];
+                    html += "<div class=\"layui-col-lg3 layui-col-md4 layui-col-sm6\">\n" +
+                        "        <a href=\"" + link.url + "\" target=\"_blank\" class=\"friendlink-item\">\n" +
+                        "            <h2>" + link.linkName + "</h2>\n" +
+                        "            <p>" + link.url + "</p>\n" +
+                        "        </a>\n" +
+                        "        <a href=\"javascript:actionConfirm(" + link.id + ", 'delLink')\" style=\"text-align: center; color: #009688\">删除</a>" +
+                        "    </div>";
+                }
+            } else {
+                for (let i in links) {
+                    let link = links[i];
+                    html += "<div class=\"layui-col-lg3 layui-col-md4 layui-col-sm6\">\n" +
+                        "        <a href=\"" + link.url + "\" target=\"_blank\" class=\"friendlink-item\">\n" +
+                        "            <h2>" + link.linkName + "</h2>\n" +
+                        "            <p>" + link.url + "</p>\n" +
+                        "        </a>\n" +
+                        "    </div>";
+                }
+            }
+            document.getElementById("friend-link-about").innerHTML = html;
         },
         error:function () {
             layer.alert('内部错误');

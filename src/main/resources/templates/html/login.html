@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Lz不落阁</title>
+    <title>登录页</title>
     <link rel="stylesheet" href="/res/lib/layui/css/layui.css">
     <link rel="stylesheet" href="/res/lib/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="/res/css/site.css">
@@ -28,7 +28,7 @@
 <div id="head"></div>
 <!-- 主体 -->
 <div class="blog-body" id="main-body">
-    <div class="layui-container">
+    <div class="layui-container" id="login-container">
         <div class="layui-row layui-col-space15">
             <form class="layui-form" action="">
                 <div class="layui-form-item">
@@ -68,12 +68,6 @@
 <!-- 侧边导航遮罩 -->
 <div class="blog-mask animated layui-hide"></div>
 <script src="/res/lib/jquery.min.js"></script>
-<!--qq登录构建url-->
-<!--<script type="text/javascript"  charset="utf-8"-->
-<!--        src="http://connect.qq.com/qc_jssdk.js"-->
-<!--        data-appid="102017018"-->
-<!--        data-redirecturi="http://lan5th.xyz/user/qqAuth"-->
-<!--&gt;</script>-->
 <!-- 引用公共资源 -->
 <script type="text/javascript" th:inline="javascript">
     let errMsg = [[${errMsg}]];
@@ -84,7 +78,6 @@
     $(document).ready(function () {
         $("#foot").load("/html/foot.html");
         $("#head").load("/html/head.html");
-        $("#layout").load("/html/layout.html");
         $("#side").load("/html/side.html");
     });
 
@@ -123,13 +116,11 @@
         });
     });
 
-    // QC.Login({
-    //     btnId:"qqLoginBtn"	//插入按钮的节点id
-    // });
+    let containerHeight = window.innerHeight - 143;
+    document.getElementById("login-container").style.minHeight = containerHeight + "px";
 </script>
 <script src="https://cdn.bootcss.com/scrollReveal.js/3.3.6/scrollreveal.js"></script>
 <script src="/res/js/site.js"></script>
 <script src="/res/js/homepage.js"></script>
 </body>
-
 </html>

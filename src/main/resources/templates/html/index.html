@@ -74,13 +74,10 @@
                 <div class="layui-row layui-col-space10">
                     <div class="layui-col-sm12 layui-col-md12">
                         <div class="blogerinfo shadow">
-                            <!--                            <div class="blogerinfo-figure">-->
-                            <!--                                <img src="/res/images/Leo.jpg" alt="Leo" />-->
-                            <!--                            </div>-->
                             <div class="blogerinfo-info">
                                 <p class="blogerinfo-nickname">Lan5th</p>
-                                <p class="blogerinfo-introduce">主要在学习Java编程，还有很大进步空间</p>
-                                <!--                                <p class="blogerinfo-location"><i class="fa fa-location-arrow"></i>&nbsp;四川 - 成都</p>-->
+                                <p class="blogerinfo-introduce">01年小生一枚，正在努力学习Java编程</p>
+                                <p class="blogerinfo-location"><i class="fa fa-location-arrow"></i>&nbsp;四川 - 成都</p>
                             </div>
                             <div class="blogerinfo-contact">
                                 <a target="_blank" title="QQ交流"
@@ -104,30 +101,9 @@
                             <div class="blog-card-title">
                                 <span class="icon"><i class="layui-icon" aria-hidden="true">&#xe6c6;</i></span>
                                 <span class="text">博主推荐</span>
+                                <a class="link-btn" href="javascript:addLink(1)" style="float: right; color: #009688" hidden>增加链接</a>
                             </div>
-                            <ul class="blog-card-ul">
-                                <li>
-                                    <span class="layui-badge ">1</span><a href="detail.html"
-                                                                          title=".NET Core 3.0正式版发布">.NET Core 3.0正式版发布</a>
-                                </li>
-                                <li>
-                                    <span class="layui-badge ">2</span><a href="detail.html"
-                                                                          title="JS动画效果之妙用Animate.css">JS动画效果之妙用Animate.css</a>
-                                </li>
-                                <li>
-                                    <span class="layui-badge ">3</span><a href="detail.html"
-                                                                          title="使用ASP.NET Core SignalR搭建聊天室（本站聊天室）">使用ASP.NET Core
-                                    SignalR搭建聊天室（本站聊天室）</a>
-                                </li>
-                                <li>
-                                    <span class="layui-badge layui-bg-blue">4</span><a href="detail.html"
-                                                                                       title="小程序黑科技之获取手机号码、通讯地址、地理位置">小程序黑科技之获取手机号码、通讯地址、地理位置</a>
-                                </li>
-                                <li>
-                                    <span class="layui-badge layui-bg-blue">5</span><a href="detail.html"
-                                                                                       title="ASP.NET Core第三方认证之QQ登录">ASP.NET Core第三方认证之QQ登录</a>
-                                </li>
-                            </ul>
+                            <ul id="link-space-recommend" class="blog-card-ul"></ul>
                         </div>
                     </div>
                     <div class="layui-col-sm6 layui-col-md12">
@@ -135,10 +111,9 @@
                             <div class="blog-card-title">
                                 <span class="icon"><i class="layui-icon" aria-hidden="true">&#xe64c;</i></span>
                                 <span class="text">友情链接</span>
+                                <a class="link-btn" href="javascript:addLink(2)" style="float: right; color: #009688" hidden>增加链接</a>
                             </div>
-                            <ul class="blogroll">
-                                <li><a target="_blank" href="https://lan5th.github.io/" title="github站">github站</a></li>
-                            </ul>
+                            <ul id = "link-space-friend" class="blogroll"></ul>
                         </div>
                     </div>
                     <!--空白填充块-->
@@ -171,7 +146,7 @@
 <div class="blog-mask animated layui-hide"></div>
 <script src="/res/lib/jquery.min.js"></script>
 <script src="/res/js/index.js"></script>
-<!--<script src="/res/js/common.js"></script>-->
+<script src="/res/js/site.js"></script>
 <!-- 引用公共资源 -->
 <script type="text/javascript" th:inline="javascript">
     $(document).ready(function() {
@@ -184,12 +159,10 @@
         $("#head").load("/html/head.html", function () {
             headFunction();
         });
-        $("#layout").load("/html/layout.html");
         $("#side").load("/html/side.html");
     });
 </script>
 <script src="https://cdn.bootcss.com/scrollReveal.js/3.3.6/scrollreveal.js"></script>
-<script src="/res/js/site.js"></script>
 <script src="/res/js/homepage.js"></script>
 </body>
 

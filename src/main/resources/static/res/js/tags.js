@@ -124,6 +124,7 @@ function changeTag(tagId) {
 }
 
 function getAllTags() {
+    getLinks();
     $.ajax({
         headers: {
             'token': localStorage.getItem('login-token')

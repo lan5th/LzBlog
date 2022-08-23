@@ -6,11 +6,10 @@ import com.lan5th.blog.pojo.Tag;
 import com.lan5th.blog.service.BlogsService;
 import com.lan5th.blog.service.TagsService;
 import com.lan5th.blog.utils.RedisUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,16 +17,16 @@ import java.util.List;
  * @author lan5th
  * @date 2022/6/23 21:40
  */
+@Slf4j
 @Service
 public class TagsServiceImpl implements TagsService {
-    private static final Logger logger = LoggerFactory.getLogger(TagsServiceImpl.class);
     private static final String TAGS_KEY = "tags";
     private static final int EXPIRE_TIME = 10;
-    @Autowired
+    @Resource
     private RedisUtil redisUtil;
-    @Autowired
+    @Resource
     private TagMapper tagMapper;
-    @Autowired
+    @Resource
     private BlogsService blogsService;
     
     @Override
@@ -51,7 +50,7 @@ public class TagsServiceImpl implements TagsService {
     }
     
     @Override
-    public Integer getAllTagCount() {
+    public int getAllTagCount() {
         return getAllTags().size();
     }
     

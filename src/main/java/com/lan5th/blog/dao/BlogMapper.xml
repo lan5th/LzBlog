@@ -83,4 +83,14 @@
     <select id="getTotalCount" resultType="integer">
         select count(1) from lz_blog.blogs where deleted = 0;
     </select>
+
+    <update id="batchUpdateViews" parameterType="java.util.HashMap">
+        <if test="viewsMap != null and viewsMap.size() > 0">
+             insert into lz_blog.blogs(id, blog_name, tag_id, views) values
+            <foreach collection="viewsMap.entrySet()" open="(" separator="), (" close=")" index="key" item="value">
+                #{key}, 0, 0, #{value}
+            </foreach>
+            on duplicate key update views = values(views)
+        </if>
+    </update>
 </mapper>

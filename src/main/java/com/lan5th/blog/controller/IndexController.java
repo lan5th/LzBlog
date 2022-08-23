@@ -2,24 +2,28 @@ package com.lan5th.blog.controller;
 
 import com.lan5th.blog.anotation.RequireToken;
 import com.lan5th.blog.pojo.BlogDetail;
+import com.lan5th.blog.pojo.Link;
 import com.lan5th.blog.pojo.Tag;
 import com.lan5th.blog.pojo.User;
 import com.lan5th.blog.service.BlogDetailsService;
 import com.lan5th.blog.service.BlogsService;
 import com.lan5th.blog.service.CommentService;
+import com.lan5th.blog.service.LinkService;
 import com.lan5th.blog.service.TagsService;
 import com.lan5th.blog.utils.JsonObject;
 import com.lan5th.blog.utils.UserUtil;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,14 +35,16 @@ import java.util.Map;
 @Controller
 @RequestMapping("/index")
 public class IndexController {
-    @Autowired
+    @Resource
     private BlogsService blogsService;
-    @Autowired
+    @Resource
     private TagsService tagsService;
-    @Autowired
+    @Resource
     private CommentService commentService;
-    @Autowired
+    @Resource
     private BlogDetailsService blogDetailsService;
+    @Resource
+    private LinkService linkService;
     
     @RequestMapping(path = "/tags", method = RequestMethod.GET)
     public ModelAndView tags() {
@@ -135,5 +141,44 @@ public class IndexController {
         String tagName = (String) params.get("tagName");
         tagsService.updateTag(id, tagName);
         return new JsonObject();
+    }
+    
+    @ResponseBody
+    @RequestMapping(value = "/getLinks", method = RequestMethod.GET)
+    public JsonObject getLinks(@RequestParam Map<String, Object> params) {
+        JsonObject res = new JsonObject();
+        Integer type = Integer.valueOf((String) params.get("type"));
+        List<Link> linkList = null;
+        switch (type) {
+            case 1:
+                linkList = linkService.getAllRecommendLinks();
+                break;
+            case 2:
+                linkList = linkService.getAllFriendLinks();
+                break;
+        }
+        res.put("links", linkList);
+        return res;
+    }
+    
+    @Transactional
+    @RequireToken
+    @ResponseBody
+    @RequestMapping(value = "/saveLink", method = RequestMethod.POST)
+    public JsonObject saveLink(Link link) {
+        JsonObject res = new JsonObject();
+        linkService.saveLink(link);
+        return res;
+    }
+    
+    @Transactional
+    @RequireToken
+    @ResponseBody
+    @RequestMapping(value = "/delLink", method = RequestMethod.DELETE)
+    public JsonObject delLink(@RequestParam Map<String, Object> params) {
+        JsonObject res = new JsonObject();
+        String id = (String) params.get("id");
+        linkService.deleteLink(id);
+        return res;
     }
 }

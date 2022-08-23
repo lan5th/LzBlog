@@ -5,7 +5,6 @@ import com.lan5th.blog.pojo.BlogDetail;
 import com.lan5th.blog.service.BlogDetailsService;
 import com.lan5th.blog.service.FIleService;
 import com.lan5th.blog.utils.JsonObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.Map;
 
@@ -26,9 +26,9 @@ import java.util.Map;
 @RequestMapping("/file")
 public class FIleController {
     private static final Long FILE_SIZE_LIMIT = 1L * 1024L * 1024L;
-    @Autowired
+    @Resource
     private BlogDetailsService blogDetailsService;
-    @Autowired
+    @Resource
     private FIleService fIleService;
     
     /**

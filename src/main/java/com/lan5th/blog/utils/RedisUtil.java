@@ -1,11 +1,12 @@
 package com.lan5th.blog.utils;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.SetOperations;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.Collection;
+import javax.annotation.Resource;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
@@ -15,7 +16,7 @@ import java.util.concurrent.TimeUnit;
  */
 @Component
 public class RedisUtil {
-    @Autowired
+    @Resource
     private RedisTemplate redisTemplate;
 
     /**
@@ -125,5 +126,83 @@ public class RedisUtil {
             e.printStackTrace();
             return false;
         }
+    }
+    
+//    /**
+//     * 过期时间问题，已弃用
+//     */
+//    public boolean getSetAndSave(String setName, String value) {
+//        Boolean exists = false;
+//        try {
+//            exists = redisTemplate.opsForSet().isMember(setName, value);
+//            if (!exists) {
+//                redisTemplate.opsForSet().add(setName, value, 1);
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        return exists;
+//    }
+    
+    public boolean existsAndSet(String key, long time) {
+        boolean noExists = true;
+        try {
+            noExists = redisTemplate.opsForValue().setIfAbsent(key, null, time, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return !noExists;
+    }
+    
+    /**
+     * 自增的hash类型操作
+     * @param hashName 对应hashMap的key
+     * @param key 对应value的key
+     * @return
+     */
+    public boolean incHashKey(String hashName, String key) {
+        try {
+            Integer oldVal = (Integer) redisTemplate.opsForHash().get(hashName, key);
+            //自增
+            if (oldVal == null) {
+                redisTemplate.opsForHash().put(hashName, key, 1);
+            } else {
+                redisTemplate.opsForHash().increment(hashName, key, 1);
+            }
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * 获取一个hash的所有值
+     * @param hashName 对应hash的key
+     * @return
+     */
+    public Map<String, Object> getHash(String hashName) {
+        Map<String, Object> map = null;
+        try {
+            map = redisTemplate.opsForHash().entries(hashName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return map;
+    }
+    
+    /**
+     * 获取一个hash的所有值
+     * @param hashName 对应hash的key
+     * @return
+     */
+    public Object getHash(String hashName, String key) {
+        Object val = null;
+        try {
+            val = redisTemplate.opsForHash().get(hashName, key);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return val;
     }
 }

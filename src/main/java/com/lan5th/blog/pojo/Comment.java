@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.lan5th.blog.utils.UIDUtil;
 import lombok.Data;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -12,12 +13,14 @@ import java.util.Date;
  * @date 2022/6/23 21:40
  */
 @Data
-public class Comment implements Comparable<Comment>{
+public class Comment implements Comparable<Comment>, Serializable {
+    private static final Long serializeVersion = 1L;
+    
     private Long id;
     //blogId为-1是表示留言，不为0时表示博客评论
     private Long blogId;
     private String content;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
     private Boolean deleted;
     private Long userId; //评论者id

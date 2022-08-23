@@ -39,7 +39,7 @@ public interface CommentMapper {
      *      为null:  查询所有博客评论计数
      * @return
      */
-    Integer getCommentCount(Long blogId);
+    int getCommentCount(Long blogId);
     
     Comment getSingleComment(Long id);
 }

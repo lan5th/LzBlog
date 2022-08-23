@@ -1,12 +1,8 @@
-.language-java {
+code {
     color: white;
-}
-
-.language-bash {
-    color: white !important;
+    padding: 15px;
 }
 
 pre {
     background: #3e3c3f;
-    padding: 15px;
 }

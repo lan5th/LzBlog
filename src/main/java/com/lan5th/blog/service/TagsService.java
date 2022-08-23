@@ -29,7 +29,7 @@ public interface TagsService {
      * 获取所有tag数量(首页用)
      * @return
      */
-    Integer getAllTagCount();
+    int getAllTagCount();
     
     void saveTag(Tag tag);
     

@@ -4,11 +4,10 @@ import com.lan5th.blog.dao.BlogMapper;
 import com.lan5th.blog.pojo.BlogDetail;
 import com.lan5th.blog.service.BlogsService;
 import com.lan5th.blog.utils.RedisUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,18 +15,18 @@ import java.util.List;
  * @author lan5th
  * @date 2022/6/23 21:40
  */
+@Slf4j
 @Service
 public class BlogsServiceImpl implements BlogsService {
-    private static final Logger logger = LoggerFactory.getLogger(BlogsServiceImpl.class);
     //缓存标识
     private static final String CACHE_KEY = "index-";
     private static final String TOP_KEY = "top";
     private static final String TOTAL_KEY = "totalCount";
     //过期时间
     private static final int EXPIRE_TIME = 5;
-    @Autowired
+    @Resource
     private BlogMapper blogMapper;
-    @Autowired
+    @Resource
     private RedisUtil redisUtil;
     
     @Override
@@ -80,7 +79,7 @@ public class BlogsServiceImpl implements BlogsService {
         if (oldList == null)
             return;
         long id = Long.parseLong(blogId);
-        logger.info("取消置顶博客,id:" + blogId);
+        log.info("取消置顶博客,id:" + blogId);
         ArrayList<BlogDetail> newList = new ArrayList<>();
         for (BlogDetail detail : oldList) {
             if (detail.getId().equals(id))
@@ -97,7 +96,7 @@ public class BlogsServiceImpl implements BlogsService {
     
     //置顶队列只保存在redis中，因此只能set的时候进行保存，get的时候无法保存redis
     private void setTopBlog(List<Long> idList) {
-        logger.info("设置置顶博客,ids:" + idList);
+        log.info("设置置顶博客,ids:" + idList);
         if (idList == null || idList.size() == 0) {
             redisUtil.delete(TOP_KEY);
             return;
@@ -109,7 +108,7 @@ public class BlogsServiceImpl implements BlogsService {
     }
     
     @Override
-    public Integer getTotalCount() {
+    public int getTotalCount() {
         Integer totalCount = 0;
         if ((totalCount = (Integer) redisUtil.get(TOTAL_KEY)) == null) {
             totalCount = blogMapper.getTotalCount();

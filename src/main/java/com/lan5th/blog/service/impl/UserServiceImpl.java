@@ -15,31 +15,32 @@ import com.qq.connect.api.qzone.UserInfo;
 import com.qq.connect.javabeans.AccessToken;
 import com.qq.connect.javabeans.qzone.UserInfoBean;
 import com.qq.connect.oauth.Oauth;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author lan5th
  * @date 2022/6/28 10:01
  */
+@Slf4j
 @Service
 public class UserServiceImpl implements UserService {
-    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
     private static final String LOGIN_KEY = "token-";
     private static final String USER_INFO_KEY = "userInfo-";
+//    private static final Long EXPIRE_TIME = 30 * 60 * 1000L;
     
     //qq登录统一密码
     private static final String QQ_LOGIN_PASS = "qqLogin";
-    @Autowired
+    @Resource
     private UserMapper userMapper;
-    @Autowired
+    @Resource
     private UserAuthMapper userAuthMapper;
-    @Autowired
+    @Resource
     private RedisUtil redisUtil;
     
     @Override
@@ -48,8 +49,12 @@ public class UserServiceImpl implements UserService {
             if (!userId.isEmpty() && !password.isEmpty()) {
                 UserAuth byId = userAuthMapper.auth(Long.parseLong(userId));
                 if (byId != null && byId.getPassword().equals(password)) {
-                    logger.info(byId.getId() + " 进行了管理员登录");
-                    String sign = JWT.create().withAudience(String.valueOf(byId.getId())).sign(Algorithm.HMAC256(byId.getPassword()));
+                    log.info(byId.getId() + " 进行了管理员登录");
+                    //签发Token
+                    String sign = JWT.create().withAudience(String.valueOf(byId.getId()))
+//                            .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRE_TIME))
+                            .withIssuedAt(new Date())
+                            .sign(Algorithm.HMAC256(byId.getPassword()));
                     //30min过期
                     redisUtil.set(LOGIN_KEY + byId.getId().toString(), byId, 1, TimeUnit.HOURS);
                     return sign;
@@ -98,7 +103,7 @@ public class UserServiceImpl implements UserService {
             //这里sdk会自己再用code发一次请求来获取accessToken
             String accessToken = accessTokenObj.getAccessToken();
             if ("".equals(accessToken)) {
-                logger.error("没有获取到响应参数");
+                log.error("没有获取到响应参数");
             } else {
                 OpenID openIDObj =  new OpenID(accessToken);
                 String openID = openIDObj.getUserOpenID();
@@ -127,17 +132,20 @@ public class UserServiceImpl implements UserService {
                     } else {
                         auth = userAuthMapper.getById(user.getId());
                     }
-                    logger.info(user.getId() + " 进行了qq登录");
+                    log.info(user.getId() + " 进行了qq登录");
                     //获取本地token
-                    String sign = JWT.create().withAudience(String.valueOf(user.getId())).sign(Algorithm.HMAC256(QQ_LOGIN_PASS));
+                    String sign = JWT.create().withAudience(String.valueOf(user.getId()))
+//                            .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRE_TIME))
+                            .withIssuedAt(new Date())
+                            .sign(Algorithm.HMAC256(QQ_LOGIN_PASS));
                     redisUtil.set(LOGIN_KEY + user.getId(), auth, 1, TimeUnit.HOURS);
                     return sign;
                 } else {
-                    logger.warn("未能正确获取到用户信息，原因是： " + userInfoBean.getMsg());
+                    log.warn("未能正确获取到用户信息，原因是： " + userInfoBean.getMsg());
                 }
             }
         } catch (QQConnectException e) {
-            logger.error("未知错误QQConnectException", e);
+            log.error("未知错误QQConnectException", e);
         }
         return null;
     }

@@ -35,7 +35,7 @@ public interface BlogsService {
     
     void removeAllTops();
     
-    Integer getTotalCount();
+    int getTotalCount();
     
     /**
      * tagId传null即为全部查询

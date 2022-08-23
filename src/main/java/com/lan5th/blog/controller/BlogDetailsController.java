@@ -7,7 +7,7 @@ import com.lan5th.blog.service.BlogDetailsService;
 import com.lan5th.blog.service.CommentService;
 import com.lan5th.blog.service.TagsService;
 import com.lan5th.blog.utils.JsonObject;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,27 +15,35 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Map;
 
 /**
  * @author lan5th
  * @date 2022/6/23 21:40
  */
+@Slf4j
 @Controller
 @RequestMapping("/details")
 public class BlogDetailsController {
-    @Autowired
+    @Resource
     private BlogDetailsService blogDetailsService;
-    @Autowired
+    @Resource
     private TagsService tagsService;
-    @Autowired
+    @Resource
     private CommentService commentService;
 
     @RequestMapping(value = "/{articleId}", method = RequestMethod.GET)
     public ModelAndView details(@PathVariable("articleId") String articleId) {
         ModelAndView mav = new ModelAndView("html/detail");
+        //先增加阅读数再封装数据
+        addBlogViews(articleId);
         BlogDetail detail = blogDetailsService.getBlogDetail(articleId);
         if (detail != null) {
             //设置参数
@@ -122,5 +130,25 @@ public class BlogDetailsController {
             res.setMessage(msg);
         }
         return res;
+    }
+    
+    //增加博客阅读人数专用方法
+    private void addBlogViews(String blogId) {
+        RequestAttributes attributes = RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = ((ServletRequestAttributes) attributes).getRequest();
+        
+        String ip = request.getRemoteAddr();
+        //获取代理ip
+        String headerIP = request.getHeader("x-real-ip");
+        if (headerIP == null || "".equals(headerIP) || "null".equals(headerIP)){
+            headerIP = request.getHeader("x-forwarded-for");
+        }
+        
+        if (headerIP !=null && !"".equals(headerIP) && !"null".equals(headerIP)){
+            //如果使用多重代理，拿到的x-forwarded-for可能是一连串用" "分割的ip，这里取第一个为真实ip
+            headerIP = headerIP.split(" ")[0];
+            ip = headerIP;
+        }
+        blogDetailsService.increaseView(blogId, ip);
     }
 }

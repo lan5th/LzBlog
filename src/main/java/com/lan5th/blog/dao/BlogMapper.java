@@ -2,8 +2,10 @@ package com.lan5th.blog.dao;
 
 import com.lan5th.blog.pojo.BlogDetail;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -30,5 +32,8 @@ public interface BlogMapper {
     
     List<BlogDetail> getByIds(List<Long> ids);
     
-    Integer getTotalCount();
+    int getTotalCount();
+    
+    void batchUpdateViews(@Param("viewsMap") HashMap<Long, Integer> viewsMap);
+//    void batchUpdateViews(@Param("viewsMap")Set<Long, Integer> viewsMap);
 }

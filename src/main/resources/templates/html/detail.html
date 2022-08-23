@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>博客详情页</title>
     <link rel="stylesheet" href="/res/lib/layui/css/layui.css">
     <link rel="stylesheet" href="/res/lib/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="/res/css/site.css">
@@ -22,6 +22,10 @@
     <style type="text/css">
         code {
             font-size: 18px;
+        }
+
+        img {
+            max-width: 540px;
         }
     </style>
 </head>
@@ -52,15 +56,6 @@
                     </div>
                     <div class="article-detail-title"></div>
                     <div id="markdown-content" style="font-size: 18px"></div>
-                </div>
-                <div class="article-component">
-                    <div class="component-box">
-                        <a href="javascript:;" class="praise" blog-event="praise"><i
-                                class="fa fa-thumbs-up fa-fw"></i>点赞（<span id="praiseCnt">0</span>）</a>
-                        <a href="javascript:;" class="reword" blog-event="reword">赏</a>
-                        <a href="javascript:;" class="share" blog-event="share"><i
-                                class="fa fa-share-alt fa-fw"></i>分享（<span id="shareCnt">0</span>）</a>
-                    </div>
                 </div>
                 <div class="blog-card blog-card-padding shadow">
                     <fieldset class="layui-elem-field layui-field-title" style="margin-bottom:0">
@@ -100,7 +95,6 @@
         $("#head").load("/html/head.html", function () {
             headFunction();
         });
-        $("#layout").load("/html/layout.html");
         $("#side").load("/html/side.html");
     });
 </script>
@@ -129,6 +123,7 @@
     });
     let detail = [[${detail}]];
     let articleContent = [[${articleContent}]];
+    document.title = detail.blogName;
     window.blogId = detail.id;
     //文章数据渲染
     window.onload = function() {
@@ -138,10 +133,10 @@
             "                                " + detail.createTime + "</button>\n" +
             "                            <div class=\"layui-btn-group\">\n" +
             "                                <button class=\"layui-btn layui-btn-primary layui-btn-xs\" title=\"浏览\">\n" +
-            "                                    <i class=\"fa fa-eye fa-fw\"></i><span style=\"margin-left:3px;\">28</span>\n" +
+            "                                    <i class=\"fa fa-eye fa-fw\"></i><span style=\"margin-left:3px;\">" + detail.views + "</span>\n" +
             "                                </button>\n" +
             "                                <button class=\"layui-btn layui-btn-primary layui-btn-xs\" title=\"评论\">\n" +
-            "                                    <i class=\"fa fa-comments fa-fw\"></i><span style=\"margin-left:3px;\">0</span>\n" +
+            "                                    <i class=\"fa fa-comments fa-fw\"></i><span id=\"commentTotal\" style=\"margin-left:3px;\">" + [[${commentTotal}]] + "</span>\n" +
             "                                </button>\n" +
             "                            </div>";
         document.getElementsByClassName('layui-breadcrumb')[0].innerHTML = "<a href=\"/\">首页</a>\n" +

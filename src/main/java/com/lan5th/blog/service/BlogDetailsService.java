@@ -41,4 +41,10 @@ public interface BlogDetailsService {
      * @return 为null则删除成功
      */
     String deleteBlog(String id);
+    
+    /**
+     * 增加阅读量
+     * @return
+     */
+    boolean increaseView(String blogId, String ipHost);
 }

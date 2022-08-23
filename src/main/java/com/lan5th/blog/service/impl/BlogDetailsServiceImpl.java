@@ -8,33 +8,39 @@ import com.lan5th.blog.service.BlogsService;
 import com.lan5th.blog.service.FIleService;
 import com.lan5th.blog.service.TagsService;
 import com.lan5th.blog.utils.RedisUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author lan5th
  * @date 2022/6/23 21:40
  */
+@Slf4j
 @Service
 public class BlogDetailsServiceImpl implements BlogDetailsService {
-    private static final Logger logger = LoggerFactory.getLogger(BlogDetailsServiceImpl.class);
     //前缀标识
     private static final String CACHE_KEY = "detail-";
+    //防重复增加阅读量前缀标识,格式: blogView-blogId-ip
+    private static final String BLOG_VIEW_IP_CHECK = "blogViewIp";
+    //存放所有博客阅读量的hashKey
+    private static final String ALL_BLOG_VIEW_COUNT = "allBlogViewCount";
     //过期时间
     private static final int EXPIRE_TIME = 5;
-    @Autowired
+    @Resource
     private BlogMapper mapper;
-    @Autowired
+    @Resource
     private RedisUtil redisUtil;
-    @Autowired
+    @Resource
     private FIleService fIleService;
-    @Autowired
+    @Resource
     private BlogsService blogsService;
-    @Autowired
+    @Resource
     private TagsService tagsService;
 
     /**
@@ -55,6 +61,13 @@ public class BlogDetailsServiceImpl implements BlogDetailsService {
         } else {
             blogDetail = (BlogDetail) o;
         }
+        
+        //获取缓存中的阅读量
+        Integer views = (Integer) redisUtil.getHash(ALL_BLOG_VIEW_COUNT, id);
+        if (views != null && views != 0) {
+            blogDetail.setViews(views);
+        }
+        
         return blogDetail;
     }
     
@@ -81,7 +94,7 @@ public class BlogDetailsServiceImpl implements BlogDetailsService {
             blogDetail.setTagId(0L);
         
         if (redisUtil.hasKey(CACHE_KEY + blogDetail.getId()) || mapper.getById(blogDetail.getId()) != null) {
-            logger.warn("create-博客已存在,id:" +blogDetail.getId());
+            log.warn("create-博客已存在,id:" +blogDetail.getId());
             return "博客已存在，请勿重复上传";
         }
         mapper.save(blogDetail);
@@ -104,7 +117,7 @@ public class BlogDetailsServiceImpl implements BlogDetailsService {
         //更新博客时如果旧博客路径存在则需要删除旧文件
         if (blogDetail.getLocation() != null && oldBlog.getLocation() != null &&
                 !blogDetail.getLocation().equals(oldBlog.getLocation())) {
-            logger.info("updateBlog-旧博客文件存在，需要删除旧博客文件:" + oldBlog.getLocation());
+            log.info("updateBlog-旧博客文件存在，需要删除旧博客文件:" + oldBlog.getLocation());
             fIleService.delete(oldBlog.getLocation());
         }
         mapper.update(blogDetail);
@@ -116,7 +129,7 @@ public class BlogDetailsServiceImpl implements BlogDetailsService {
     public String deleteBlog(String id) {
         long blogId = Long.parseLong(id);
         if (mapper.getById(blogId) == null) {
-            logger.warn("deleteBlog-博客不存在,id:" + id);
+            log.warn("deleteBlog-博客不存在,id:" + id);
             return "博客不存在，请重新上传";
         }
         //必须先删除文件，再删除数据
@@ -133,7 +146,7 @@ public class BlogDetailsServiceImpl implements BlogDetailsService {
         Tag tag = tagsService.getTag(tagId);
         //当tag下面没有博客时TagMapper会查不出数据，因此这里会是null
         if (tag == null || tag.getBlogCount() == 0) {
-            logger.info("该tag下所有博客已被清空，即将删除tag数据,tagId" + tagId);
+            log.info("该tag下所有博客已被清空，即将删除tag数据,tagId" + tagId);
             tagsService.delTag(tagId);
         }
     
@@ -142,5 +155,35 @@ public class BlogDetailsServiceImpl implements BlogDetailsService {
         blogsService.cleanListCache();
         tagsService.cleanTagsCache();
         return null;
+    }
+    
+    @Override
+    public boolean increaseView(String blogId, String ipHost) {
+        //ip检查30min过期
+        boolean viewed = redisUtil.existsAndSet(BLOG_VIEW_IP_CHECK + "-" + blogId + "-" + ipHost, 30);
+        //已经浏览过不增加浏览量
+        if (!viewed) {
+            redisUtil.incHashKey(ALL_BLOG_VIEW_COUNT, blogId);
+            return true;
+        }
+        return false;
+    }
+    
+    /**
+     * 定时任务将浏览量存入数据库
+     */
+    @Scheduled(cron = "0 0 0 * * *")
+    public void save2Base(){
+        log.info("执行保存浏览量定时任务");
+        Map<String, Object> viewCount = redisUtil.getHash(ALL_BLOG_VIEW_COUNT);
+        //将String:Object转换为Long:Integer
+        HashMap<Long, Integer> viewCount1 = new HashMap<>();
+        for (String k :viewCount.keySet()){
+            Long nKey = Long.parseLong(k);
+            Integer nVal = (Integer) viewCount.get(k);
+            viewCount1.put(nKey, nVal);
+        }
+        mapper.batchUpdateViews(viewCount1);
+        log.info("保存阅读数总量:" + viewCount1.size());
     }
 }

@@ -4,16 +4,15 @@ import com.lan5th.blog.pojo.BlogDetail;
 import com.lan5th.blog.service.BlogDetailsService;
 import com.lan5th.blog.service.FIleService;
 import com.lan5th.blog.utils.RedisUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.system.ApplicationHome;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -25,9 +24,9 @@ import java.util.Date;
  * @author lan5th
  * @date 2022/6/29 16:38
  */
+@Slf4j
 @Service
 public class FileServiceImpl implements FIleService, InitializingBean {
-    private static final Logger logger = LoggerFactory.getLogger(FileServiceImpl.class);
     private static String FILE_PATH;
     
     @Override
@@ -40,7 +39,7 @@ public class FileServiceImpl implements FIleService, InitializingBean {
             jarFile = ah.getSource();
             filePath = jarFile.getParentFile().getPath() + "/upload/";
             FILE_PATH = filePath;
-            logger.info("初始化文件上传路径:" + filePath);
+            log.info("初始化文件上传路径:" + filePath);
         } catch (NullPointerException e) {
             // TODO 运行单元测试时ApplicationHome(getClass())会报空指针异常
         }
@@ -49,9 +48,9 @@ public class FileServiceImpl implements FIleService, InitializingBean {
     private static final String CONTENT_KEY = "blogContent-";
     //1min缓存
     private static final Integer EXPIRE_TIME = 60;
-    @Autowired
+    @Resource
     private BlogDetailsService blogDetailsService;
-    @Autowired
+    @Resource
     private RedisUtil redisUtil;
     
     @Override
@@ -68,7 +67,7 @@ public class FileServiceImpl implements FIleService, InitializingBean {
         String blogPath = realPath + "/" + blogId;
         //保存文件
         FileUtils.copyInputStreamToFile(file.getInputStream(), new File(blogPath));
-        logger.info("blogId:" + blogId + ",上传文件路径：" + blogPath);
+        log.info("blogId:" + blogId + ",上传文件路径：" + blogPath);
         return "public/posts" + datePath + "/" + blogId;
     }
     
@@ -78,7 +77,7 @@ public class FileServiceImpl implements FIleService, InitializingBean {
             return;
         File toBeDelete = new File(FILE_PATH + location);
         if (!toBeDelete.exists()) {
-            logger.error("文件不存在,文件路径:" + location);
+            log.error("文件不存在,文件路径:" + location);
         } else {
             toBeDelete.delete();
         }
@@ -99,7 +98,7 @@ public class FileServiceImpl implements FIleService, InitializingBean {
             try {
                 contentFile = ResourceUtils.getFile(location);
             } catch (FileNotFoundException e) {
-                logger.error("文件不存在，博客id:" + id);;
+                log.error("文件不存在，博客id:" + id);;
             }
             
             //流操作使用try-with-resource方式，更安全
@@ -115,8 +114,8 @@ public class FileServiceImpl implements FIleService, InitializingBean {
                         builder.append("\n");
                     }
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                log.error("文件模块报错", e);
             }
             
             content = builder.toString();

@@ -1,4 +1,5 @@
 function topBlog() {
+    getLinks();
     $.ajax({
         headers: {
             'token': localStorage.getItem("login-token")

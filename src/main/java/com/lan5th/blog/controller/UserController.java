@@ -4,34 +4,30 @@ import com.lan5th.blog.service.UserService;
 import com.lan5th.blog.utils.JsonObject;
 import com.lan5th.blog.utils.UserUtil;
 import com.qq.connect.QQConnectException;
-import com.qq.connect.api.OpenID;
-import com.qq.connect.api.qzone.UserInfo;
-import com.qq.connect.javabeans.AccessToken;
-import com.qq.connect.javabeans.qzone.UserInfoBean;
 import com.qq.connect.oauth.Oauth;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
  * @author lan5th
  * @date 2022/6/28 8:40
  */
+@Slf4j
 @Controller
 @RequestMapping("/user")
 public class UserController {
-    @Autowired
+    @Resource
     private UserService userService;
     
     @RequestMapping(path = "/login", method = RequestMethod.GET)
@@ -67,7 +63,7 @@ public class UserController {
         try {
             response.sendRedirect(new Oauth().getAuthorizeURL(request));
         } catch (QQConnectException | IOException e) {
-            e.printStackTrace();
+            log.error("QQ登录重定向报错", e);
         }
     }
     

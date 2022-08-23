@@ -6,11 +6,10 @@ import com.lan5th.blog.pojo.User;
 import com.lan5th.blog.service.CommentService;
 import com.lan5th.blog.utils.RedisUtil;
 import com.lan5th.blog.utils.UserUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,9 +17,9 @@ import java.util.List;
  * @author lan5th
  * @date 2022/6/23 22:40
  */
+@Slf4j
 @Service
 public class CommentServiceImpl implements CommentService {
-    private static final Logger logger = LoggerFactory.getLogger(CommentServiceImpl.class);
     //缓存标识
     private static final String COMMENT_COUNT_KEY = "commentCount";
     private static final String REPLY_COUNT_KEY = "replyCount";
@@ -28,13 +27,13 @@ public class CommentServiceImpl implements CommentService {
     private static final String REPLY_KEY = "reply-";
     //过期时间
     private static final int EXPIRE_TIME = 5;
-    @Autowired
+    @Resource
     private RedisUtil redisUtil;
-    @Autowired
+    @Resource
     private CommentMapper commentMapper;
     
     @Override
-    public Integer getBlogCommentCount(String blogId) {
+    public int getBlogCommentCount(String blogId) {
         Integer commentCount;
         if (blogId == null) {
             //所有博客评论计数
@@ -53,7 +52,7 @@ public class CommentServiceImpl implements CommentService {
     }
     
     @Override
-    public Integer getReplyCount() {
+    public int getReplyCount() {
         Integer commentCount;
         if ((commentCount = (Integer) redisUtil.get(REPLY_COUNT_KEY)) == null) {
             commentCount = commentMapper.getCommentCount(-1L);
@@ -108,7 +107,7 @@ public class CommentServiceImpl implements CommentService {
         }
         User currentUser = UserUtil.getCurrentUser();
         comment.setUserId(currentUser.getId());
-        logger.info(currentUser.getId() + " 发表了评论 " + content + ",回复给" + replyTo);
+        log.info(currentUser.getId() + " 发表了评论 " + content + ",回复给" + replyTo);
         if (replyTo != null) {
             comment.setReplyTo(Long.parseLong(replyTo));
         }
@@ -124,7 +123,7 @@ public class CommentServiceImpl implements CommentService {
     
         ArrayList<Long> idList = new ArrayList<>();
         idList.add(Long.parseLong(commentId));
-        logger.info(UserUtil.getCurrentUser().getId() + " 删除了评论,commentId" + commentId);
+        log.info(UserUtil.getCurrentUser().getId() + " 删除了评论,commentId" + commentId);
         commentMapper.deleteByIds(idList);
         cleanCommentCache(blogId);
     }

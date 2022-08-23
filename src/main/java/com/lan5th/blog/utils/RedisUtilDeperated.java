@@ -1,10 +1,10 @@
 package com.lan5th.blog.utils;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+import javax.annotation.Resource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -16,10 +16,9 @@ import java.util.concurrent.TimeUnit;
  * @date 2022/6/23 21:40
  */
 @Deprecated
-@Component
 public final class RedisUtilDeperated {
 
-    @Autowired
+    @Resource
     private static RedisTemplate<String, Object> redisTemplate;
 
     // =============================common============================
