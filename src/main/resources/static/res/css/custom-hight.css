@@ -6,3 +6,8 @@ code {
 pre {
     background: #3e3c3f;
 }
+
+p > code {
+    padding: 0px !important;
+    background: #4b494c;
+}
