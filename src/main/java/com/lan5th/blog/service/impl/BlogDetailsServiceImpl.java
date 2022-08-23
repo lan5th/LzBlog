@@ -1,5 +1,6 @@
 package com.lan5th.blog.service.impl;
 
+import com.alibaba.druid.util.StringUtils;
 import com.lan5th.blog.dao.BlogMapper;
 import com.lan5th.blog.pojo.BlogDetail;
 import com.lan5th.blog.pojo.Tag;
@@ -51,6 +52,9 @@ public class BlogDetailsServiceImpl implements BlogDetailsService {
     @Override
     public BlogDetail getBlogDetail(String id) {
         BlogDetail blogDetail = null;
+        if (!StringUtils.isNumber(id)) {
+            return null;
+        }
         long blogId = Long.parseLong(id);
         Object o = redisUtil.get(CACHE_KEY + blogId);
         if (o  == null) {

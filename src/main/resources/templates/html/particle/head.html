@@ -45,6 +45,55 @@
                 "    </a>\n"
         }
         document.getElementById("user-info-block").innerHTML = html;
+
+        layui.use(['element'], function () {
+            let $ = layui.$;
+
+            $('.blog-navicon').click(function () {
+                var sear = new RegExp('layui-hide');
+                if (sear.test($('.blog-nav-left').attr('class'))) {
+                    leftIn();
+                } else {
+                    leftOut();
+                }
+            });
+
+            $('.blog-mask').click(function () {
+                leftOut();
+            });
+
+            function leftIn() {
+                $('.blog-mask').unbind('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend');
+                $('.blog-nav-left').unbind('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend');
+
+                $('.blog-mask').removeClass('maskOut');
+                $('.blog-mask').addClass('maskIn');
+                $('.blog-mask').removeClass('layui-hide');
+                $('.blog-mask').addClass('layui-show');
+
+                $('.blog-nav-left').removeClass('leftOut');
+                $('.blog-nav-left').addClass('leftIn');
+                $('.blog-nav-left').removeClass('layui-hide');
+                $('.blog-nav-left').addClass('layui-show');
+            }
+
+            function leftOut() {
+                $('.blog-mask').on('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+                    $('.blog-mask').addClass('layui-hide');
+                });
+                $('.blog-nav-left').on('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+                    $('.blog-nav-left').addClass('layui-hide');
+                });
+
+                $('.blog-mask').removeClass('maskIn');
+                $('.blog-mask').addClass('maskOut');
+                $('.blog-mask').removeClass('layui-show');
+
+                $('.blog-nav-left').removeClass('leftIn');
+                $('.blog-nav-left').addClass('leftOut');
+                $('.blog-nav-left').removeClass('layui-show');
+            }
+        });
     }
 
     function logout() {

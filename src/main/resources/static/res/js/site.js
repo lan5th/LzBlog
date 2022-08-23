@@ -111,6 +111,13 @@
                 success: function (res) {
                     if (res.status == 1) {
                         layer.msg('提交留言成功');
+                        //重置编辑器
+                        $('#remarkEditor').val('');
+                        $('.blog-editor .layui-layedit').remove();
+                        editIndex = layedit.build('remarkEditor', {
+                            height: 150,
+                            tool: null,
+                        });
                         getComment(1, 10);
                     } else {
                         layer.alert(res.message);
@@ -141,50 +148,50 @@
             }
         });
 
-        $('.blog-navicon').click(function () {
-            var sear = new RegExp('layui-hide');
-            if (sear.test($('.blog-nav-left').attr('class'))) {
-                leftIn();
-            } else {
-                leftOut();
-            }
-        });
-
-        $('.blog-mask').click(function () {
-            leftOut();
-        });
-
-        function leftIn() {
-            $('.blog-mask').unbind('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend');
-            $('.blog-nav-left').unbind('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend');
-
-            $('.blog-mask').removeClass('maskOut');
-            $('.blog-mask').addClass('maskIn');
-            $('.blog-mask').removeClass('layui-hide');
-            $('.blog-mask').addClass('layui-show');
-
-            $('.blog-nav-left').removeClass('leftOut');
-            $('.blog-nav-left').addClass('leftIn');
-            $('.blog-nav-left').removeClass('layui-hide');
-            $('.blog-nav-left').addClass('layui-show');
-        }
-
-        function leftOut() {
-            $('.blog-mask').on('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
-                $('.blog-mask').addClass('layui-hide');
-            });
-            $('.blog-nav-left').on('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
-                $('.blog-nav-left').addClass('layui-hide');
-            });
-
-            $('.blog-mask').removeClass('maskIn');
-            $('.blog-mask').addClass('maskOut');
-            $('.blog-mask').removeClass('layui-show');
-
-            $('.blog-nav-left').removeClass('leftIn');
-            $('.blog-nav-left').addClass('leftOut');
-            $('.blog-nav-left').removeClass('layui-show');
-        }
+        // $('.blog-navicon').click(function () {
+        //     var sear = new RegExp('layui-hide');
+        //     if (sear.test($('.blog-nav-left').attr('class'))) {
+        //         leftIn();
+        //     } else {
+        //         leftOut();
+        //     }
+        // });
+        //
+        // $('.blog-mask').click(function () {
+        //     leftOut();
+        // });
+        //
+        // function leftIn() {
+        //     $('.blog-mask').unbind('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend');
+        //     $('.blog-nav-left').unbind('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend');
+        //
+        //     $('.blog-mask').removeClass('maskOut');
+        //     $('.blog-mask').addClass('maskIn');
+        //     $('.blog-mask').removeClass('layui-hide');
+        //     $('.blog-mask').addClass('layui-show');
+        //
+        //     $('.blog-nav-left').removeClass('leftOut');
+        //     $('.blog-nav-left').addClass('leftIn');
+        //     $('.blog-nav-left').removeClass('layui-hide');
+        //     $('.blog-nav-left').addClass('layui-show');
+        // }
+        //
+        // function leftOut() {
+        //     $('.blog-mask').on('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+        //         $('.blog-mask').addClass('layui-hide');
+        //     });
+        //     $('.blog-nav-left').on('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function () {
+        //         $('.blog-nav-left').addClass('layui-hide');
+        //     });
+        //
+        //     $('.blog-mask').removeClass('maskIn');
+        //     $('.blog-mask').addClass('maskOut');
+        //     $('.blog-mask').removeClass('layui-show');
+        //
+        //     $('.blog-nav-left').removeClass('leftIn');
+        //     $('.blog-nav-left').addClass('leftOut');
+        //     $('.blog-nav-left').removeClass('layui-show');
+        // }
     });
 }
 
