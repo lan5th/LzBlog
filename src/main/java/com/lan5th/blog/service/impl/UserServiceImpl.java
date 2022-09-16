@@ -115,6 +115,7 @@ public class UserServiceImpl implements UserService {
                 if (userInfoBean.getRet() == 0) { //状态码为0表示成功
                     User user = userMapper.getByOpenId(openID);
                     UserAuth auth = null;
+                    //本地未持久化
                     if (user == null) {
                         user = new User();
                         user.setId(UIDUtil.getNewId());

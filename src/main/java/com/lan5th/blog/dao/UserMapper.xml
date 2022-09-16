@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lan5th.blog.dao.UserMapper">
     <select id="getById" parameterType="long" resultType="com.lan5th.blog.pojo.User">
-        select * from lz_blog.user_info where id = #{id} and deleted = 0;
+        select id, name, avatar_url, is_admin from lz_blog.user_info where id = #{id} and deleted = 0;
     </select>
 
     <update id="update" parameterType="com.lan5th.blog.pojo.User">
@@ -24,7 +24,7 @@
 
 
     <select id="getByIds" parameterType="list" resultType="com.lan5th.blog.pojo.User">
-        select * from lz_blog.user_info where id in
+        select id, name, avatar_url, is_admin from lz_blog.user_info where id in
         <foreach collection="ids" item="id" index="index" open="(" close=")" separator=",">
             #{id}
         </foreach>

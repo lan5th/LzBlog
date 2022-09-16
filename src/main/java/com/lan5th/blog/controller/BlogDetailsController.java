@@ -1,5 +1,6 @@
 package com.lan5th.blog.controller;
 
+import com.alibaba.druid.util.StringUtils;
 import com.lan5th.blog.anotation.RequireToken;
 import com.lan5th.blog.pojo.BlogDetail;
 import com.lan5th.blog.pojo.Tag;
@@ -42,18 +43,24 @@ public class BlogDetailsController {
     @RequestMapping(value = "/{articleId}", method = RequestMethod.GET)
     public ModelAndView details(@PathVariable("articleId") String articleId) {
         ModelAndView mav = new ModelAndView("html/detail");
-        //先增加阅读数再封装数据
-        addBlogViews(articleId);
-        BlogDetail detail = blogDetailsService.getBlogDetail(articleId);
-        if (detail != null) {
-            //设置参数
-            mav.addObject("detail", detail);
-            mav.addObject("articleContent", blogDetailsService.getContent(articleId));
-            mav.addObject("commentTotal", commentService.getBlogCommentCount(articleId));
+        if (StringUtils.isNumber(articleId)) {
+            BlogDetail detail = blogDetailsService.getBlogDetail(articleId);
+            if (detail != null) {
+                addBlogViews(articleId);
+                detail.setViews(detail.getViews() + 1);
+                //设置参数
+                mav.addObject("detail", detail);
+                mav.addObject("articleContent", blogDetailsService.getContent(articleId));
+                mav.addObject("commentTotal", commentService.getBlogCommentCount(articleId));
+                
+                return mav;
+            }
         } else {
-            return new ModelAndView("html/404");
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            StringBuffer url = attributes.getRequest().getRequestURL();
+            log.error("错误的请求url: " + url);
         }
-        return mav;
+        return new ModelAndView("html/404");
     }
     
     @RequestMapping(value = "/update/{blogId}", method = RequestMethod.GET)
